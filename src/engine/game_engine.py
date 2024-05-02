@@ -5,7 +5,7 @@ import pygame
 
 from pathlib import Path
 
-from src.create.prefab_creator import create_input_player, create_player
+from src.create.prefab_creator import create_input_player, create_player, create_stars
 from src.ecs.components.c_input_command import CInputCommand, CommandPhase
 from src.ecs.components.c_surface import CSurface
 from src.ecs.components.c_transform import CTransform
@@ -13,7 +13,9 @@ from src.ecs.components.c_velocity import CVelocity
 from src.ecs.systems.s_input_player import system_input_player
 from src.ecs.systems.s_limit_player import system_limit_player
 from src.ecs.systems.s_movement import system_movement
+from src.ecs.systems.s_render_stars import system_render_stars
 from src.ecs.systems.s_rendering import system_rendering
+from src.ecs.systems.s_update_stars import system_update_stars
 
 class GameEngine:
     def __init__(self) -> None:
@@ -43,6 +45,7 @@ class GameEngine:
         self._clean()
 
     def _create(self):
+        create_stars(self.ecs_world, self.config_starfield, self.config_window)
         self._player_entity = create_player(self.ecs_world, pygame.Vector2(self.config_level['player_spawn']["position"]["x"], self.config_level['player_spawn']["position"]["y"]), self.config_player)
         self._player_c_velocity = self.ecs_world.component_for_entity(self._player_entity, CVelocity)
         self._player_c_transform = self.ecs_world.component_for_entity(self._player_entity, CTransform)
@@ -60,11 +63,13 @@ class GameEngine:
                 self.is_running = False
 
     def _update(self):
+        system_update_stars(self.ecs_world, self.delta_time, self.config_window["size"]["h"])
         system_movement(self.ecs_world, self.delta_time)
         system_limit_player(self.ecs_world, self.screen)
 
     def _draw(self):
         self.screen.fill((self.config_window['bg_color']['r'], self.config_window['bg_color']['g'], self.config_window['bg_color']['b']))
+        system_render_stars(self.ecs_world, self.screen)
         system_rendering(self.ecs_world, self.screen)
         pygame.display.flip()
 
@@ -88,8 +93,8 @@ class GameEngine:
     def _load_configurations(self):
         current_file_path = Path(__file__)
         base_path = current_file_path.parents[2]
-        config_files = ['interface.json', 'starfield.json', 'window.json', 'level.json', 'player.json', 'enemy.json']
-        config_attrs = ['config_interface', 'config_starfield', 'config_window', 'config_level', 'config_player', 'config_enemy']
+        config_files = ['interface.json', 'starfield.json', 'window.json', 'level.json', 'player.json']
+        config_attrs = ['config_interface', 'config_starfield', 'config_window', 'config_level', 'config_player']
         
         for file, attr in zip(config_files, config_attrs):
             try:
