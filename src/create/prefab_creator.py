@@ -26,24 +26,14 @@ def create_player(world: esper.World, position: pygame.Vector2, player_informati
     world.add_component(player_entity, CTagPlayer())
     return player_entity
 
-def create_bullet(world:esper.World, player_entity:int, bullet_info:dict) -> int:
-    pl_t = world.component_for_entity(player_entity, CTransform)
-    pl_s = world.component_for_entity(player_entity, CSurface)
-    pl_rect = pl_s.surface.get_rect(topleft = pl_t.position)
-    size = pygame.Vector2(bullet_info["width"], bullet_info["height"])
-    bullet_surface = pygame.Surface(size)
-    color = pygame.Color(bullet_info["color"]["r"],bullet_info["color"]["g"],bullet_info["color"]["b"])
-    bullet_size = bullet_surface.get_rect().size
-    pos = pygame.Vector2(pl_rect.x + pl_s.area.size[0] /2 - (bullet_size[0] / 2)-1,
-                         pl_rect.y - (bullet_size[1] / 2)-1)
-    vel = pygame.Vector2(0, 0)
+def create_bullet(world:esper.World, position: pygame.Vector2, bullet_information:dict) -> int:
     bullet_entity = world.create_entity()
-    world.add_component(bullet_entity, CSurface(size,color))
-    world.add_component(bullet_entity, CTransform(pos))
-    world.add_component(bullet_entity, CVelocity(vel))
-    world.add_component(bullet_entity, CTagBullet(False))
+    color = bullet_information['color']
+    world.add_component(bullet_entity, CTagBullet(active=False))
+    world.add_component(bullet_entity, CTransform(position=position))
+    world.add_component(bullet_entity, CVelocity(velocity=pygame.Vector2(0, 0)))
+    world.add_component(bullet_entity, CSurface(color=pygame.Color(color['r'], color['g'], color['b']), size=pygame.Vector2(bullet_information["width"],bullet_information["height"])))
     return bullet_entity
-
 
 def create_enemy_explosion_sprite(world:esper.World, enemy_entity:int, enemy_explosion_file:dict):
     explosion_sprite = ServiceLocator.images_service.get(enemy_explosion_file["image"])

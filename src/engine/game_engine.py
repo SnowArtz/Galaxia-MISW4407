@@ -60,9 +60,7 @@ class GameEngine:
         self._player_c_transform = self.ecs_world.component_for_entity(self._player_entity, CTransform)
         self._player_c_surface = self.ecs_world.component_for_entity(self._player_entity, CSurface)
         create_input_player(self.ecs_world)
-        self._bullet_entity = create_bullet(self.ecs_world, self._player_entity, self.config_bullet)
-        self._bullet_entity_tag = self.ecs_world.component_for_entity(self._bullet_entity, CTagBullet)
-        self._bullet_entity_tag.active = False
+        self._bullet_entity = create_bullet(self.ecs_world, pygame.Vector2(0, 0), self.config_bullet)
 
     def _calculate_time(self):
         self.clock.tick(self.frame_rate)
@@ -83,7 +81,7 @@ class GameEngine:
         system_collision_player_enemy(self.ecs_world, self._player_entity, self.config_level, self.config_player_explosion)
         system_explosion(self.ecs_world)
         system_animation(self.ecs_world, self.delta_time)
-        self._bullet_entity = system_player_bullet(self.ecs_world, self._player_entity, self.config_bullet)
+        self._bullet_entity = system_player_bullet(self.ecs_world, pygame.Vector2(self._player_c_transform.position.x + self._player_c_surface.area.width/2, self._player_c_transform.position.y), self.config_bullet)
         self.ecs_world._clear_dead_entities()
 
 
@@ -127,8 +125,8 @@ class GameEngine:
     def _load_configurations(self):
         current_file_path = Path(__file__)
         base_path = current_file_path.parents[2]
-        config_files = ['interface.json', 'starfield.json', 'window.json', 'level.json', 'player.json', 'enemy.json', 'bullet.json', 'enemy_explosion.json', 'player_explosion.json']
-        config_attrs = ['config_interface', 'config_starfield', 'config_window', 'config_level', 'config_player', 'config_enemy', 'config_bullet', 'config_enemy_explosion', 'config_player_explosion']
+        config_files = ['interface.json', 'starfield.json', 'window.json', 'level.json', 'player.json', 'bullet.json', 'enemy_explosion.json', 'player_explosion.json']
+        config_attrs = ['config_interface', 'config_starfield', 'config_window', 'config_level', 'config_player', 'config_bullet', 'config_enemy_explosion', 'config_player_explosion']
         
         for file, attr in zip(config_files, config_attrs):
             try:
