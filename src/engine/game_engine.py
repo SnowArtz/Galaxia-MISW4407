@@ -51,12 +51,12 @@ class GameEngine:
         self._player_c_transform = self.ecs_world.component_for_entity(self._player_entity, CTransform)
         self._player_c_surface = self.ecs_world.component_for_entity(self._player_entity, CSurface)
         create_input_player(self.ecs_world)
-
+        
         create_text(self.ecs_world, self.config_texts["1UP"], self.config_interface)
         create_text(self.ecs_world, self.config_texts["SCORE"], self.config_interface)
         create_text(self.ecs_world, self.config_texts["HIGH_SCORE"], self.config_interface)
         create_text(self.ecs_world, self.config_texts["HIGH_SCORE_VALUE"], self.config_interface)
-
+        
         create_lives_display(self.ecs_world)
         create_level_flags(self.ecs_world)
 
@@ -101,6 +101,7 @@ class GameEngine:
     def _load_configurations(self):
         current_file_path = Path(__file__)
         base_path = current_file_path.parents[2]
+        
         config_files = ['interface.json', 'starfield.json', 'window.json', 'level.json', 'player.json', 'texts.json']
         config_attrs = ['config_interface', 'config_starfield', 'config_window', 'config_level', 'config_player', 'config_texts']
         
