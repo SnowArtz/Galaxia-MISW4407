@@ -36,12 +36,12 @@ def create_bullet(world:esper.World, player_entity:int, bullet_info:dict) -> int
     bullet_size = bullet_surface.get_rect().size
     pos = pygame.Vector2(pl_rect.x + pl_s.area.size[0] /2 - (bullet_size[0] / 2)-1,
                          pl_rect.y - (bullet_size[1] / 2)-1)
-    vel = pygame.Vector2(0, 0)#-bullet_info["velocity"])
+    vel = pygame.Vector2(0, 0)
     bullet_entity = world.create_entity()
     world.add_component(bullet_entity, CSurface(size,color))
     world.add_component(bullet_entity, CTransform(pos))
     world.add_component(bullet_entity, CVelocity(vel))
-    world.add_component(bullet_entity, CTagBullet())
+    world.add_component(bullet_entity, CTagBullet(False))
     return bullet_entity
 
 

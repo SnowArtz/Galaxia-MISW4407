@@ -9,7 +9,7 @@ from src.ecs.components.tags.c_tag_enemy import CTagEnemy
 def system_collision_bullet_enemy(world:esper.World, bullet_entity:int, enemy_explosion_file):
     componentsE = world.get_components(CSurface, CTransform, CTagEnemy)
     componentsB = world.get_components(CSurface, CTransform, CTagBullet)
-    for bullet_entity, (bullet_s, bullet_t, _) in componentsB:
+    for bullet_entity, (bullet_s, bullet_t, bullet_tag) in componentsB:
         bullet_rect = bullet_s.area.copy()
         bullet_rect.topleft = bullet_t.position
         for enemy_entity, (c_s, c_t, _) in componentsE:

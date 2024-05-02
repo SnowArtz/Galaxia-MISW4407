@@ -19,6 +19,7 @@ from src.ecs.systems.s_explosion import system_explosion
 from src.ecs.systems.s_input_player import system_input_player
 from src.ecs.systems.s_limit_player import system_limit_player
 from src.ecs.systems.s_movement import system_movement
+from src.ecs.systems.s_player_bullet import system_player_bullet
 from src.ecs.systems.s_rendering import system_rendering
 from src.ecs.systems.s_screen_delete_bullet import system_screen_delete_bullet
 from src.engine.service_locator import ServiceLocator
@@ -59,7 +60,9 @@ class GameEngine:
         self._player_c_transform = self.ecs_world.component_for_entity(self._player_entity, CTransform)
         self._player_c_surface = self.ecs_world.component_for_entity(self._player_entity, CSurface)
         create_input_player(self.ecs_world)
-        #create_bullet(self.ecs_world, self._player_entity, self.config_bullet)
+        self._bullet_entity = create_bullet(self.ecs_world, self._player_entity, self.config_bullet)
+        self._bullet_entity_tag = self.ecs_world.component_for_entity(self._bullet_entity, CTagBullet)
+        self._bullet_entity_tag.active = False
 
     def _calculate_time(self):
         self.clock.tick(self.frame_rate)
@@ -80,6 +83,7 @@ class GameEngine:
         system_collision_player_enemy(self.ecs_world, self._player_entity, self.config_level, self.config_player_explosion)
         system_explosion(self.ecs_world)
         system_animation(self.ecs_world, self.delta_time)
+        self._bullet_entity = system_player_bullet(self.ecs_world, self._player_entity, self.config_bullet)
         self.ecs_world._clear_dead_entities()
 
 
@@ -106,15 +110,16 @@ class GameEngine:
                 self._player_c_velocity.velocity.x -= self.config_player["input_velocity"]
         elif c_input.name == "PLAYER_FIRE":
             num_components = len(self.ecs_world.get_components(CTagBullet))
-            if num_components < self.max_bullets:
-                if c_input.phase == CommandPhase.START:
-                    self._bullet_entity = create_bullet(self.ecs_world, self._player_entity, self.config_bullet)
-                    self._bullet_c_v = self.ecs_world.component_for_entity(self._bullet_entity, CVelocity)
-                    self._bullet_c_t = self.ecs_world.component_for_entity(self._bullet_entity, CTransform)
-                    direction = pygame.math.Vector2(0, -1)
-                    direction = direction.normalize()
-                    self._bullet_c_v.velocity = direction*self.config_bullet["velocity"]
-                    ServiceLocator.sounds_service.play(self.config_bullet["sound"])
+            if num_components != 0:
+                bullet_tag = self.ecs_world.component_for_entity(self._bullet_entity, CTagBullet)
+                if num_components == self.max_bullets and bullet_tag.active == False:
+                    if c_input.phase == CommandPhase.START:
+                        bullet_tag.active = True
+                        self._bullet_c_v = self.ecs_world.component_for_entity(self._bullet_entity, CVelocity)
+                        direction = pygame.math.Vector2(0, -1)
+                        direction = direction.normalize()
+                        self._bullet_c_v.velocity = direction*self.config_bullet["velocity"]
+                        ServiceLocator.sounds_service.play(self.config_bullet["sound"])
 
 
                     
