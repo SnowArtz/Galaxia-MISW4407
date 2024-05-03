@@ -6,6 +6,7 @@ import pygame
 from pathlib import Path
 
 from src.create.prefab_creator import create_bullet, create_input_player, create_level_flags, create_lives_display, create_player, create_text, create_stars
+from src.ecs.components.c_enemy_spawner import CEnemySpawner
 from src.ecs.components.c_input_command import CInputCommand, CommandPhase
 from src.ecs.components.c_surface import CSurface
 from src.ecs.components.c_transform import CTransform
@@ -15,6 +16,8 @@ from src.ecs.systems.s_animation import system_animation
 from src.ecs.systems.s_collision_bullet_enemy import system_collision_bullet_enemy
 from src.ecs.systems.s_collision_bullet_player import system_collision_bullet_player
 from src.ecs.systems.s_collision_player_enemy import system_collision_player_enemy
+from src.ecs.systems.s_enemy_movement import system_enemy_movement
+from src.ecs.systems.s_enemy_spawner import system_enemy_spawner
 from src.ecs.systems.s_explosion import system_explosion
 from src.ecs.systems.s_input_player import system_input_player
 from src.ecs.systems.s_limit_player import system_limit_player
@@ -67,6 +70,8 @@ class GameEngine:
         self._player_c_surface = self.ecs_world.component_for_entity(self._player_entity, CSurface)
         create_input_player(self.ecs_world)
         self._bullet_entity = create_bullet(self.ecs_world, pygame.Vector2(0, 0), self.config_bullet)
+        spawner_entity = self.ecs_world.create_entity()
+        self.ecs_world.add_component(spawner_entity, CEnemySpawner(self.config_enemies_list['enemy_spawn_events']))
         
         create_text(self.ecs_world, self.config_texts["1UP"], self.config_interface)
         create_text(self.ecs_world, self.config_texts["SCORE"], self.config_interface)
@@ -90,7 +95,9 @@ class GameEngine:
         system_update_stars(self.ecs_world, self.delta_time, self.config_window["size"]["h"])
         system_movement(self.ecs_world, self.delta_time)
         system_limit_player(self.ecs_world, self.screen)
+        system_enemy_movement(self.ecs_world, self.screen, self.delta_time)
         system_screen_delete_bullet(self.ecs_world, self.screen)
+        system_enemy_spawner(self.ecs_world, self.config_enemy, self.config_enemies_list)
         system_collision_bullet_enemy(self.ecs_world, self._bullet_entity, self.config_enemy_explosion)
         system_collision_bullet_player(self.ecs_world, self._bullet_entity, self.config_player_explosion)
         system_collision_player_enemy(self.ecs_world, self._player_entity, self.config_level, self.config_player_explosion)
@@ -143,8 +150,8 @@ class GameEngine:
     def _load_configurations(self):
         current_file_path = Path(__file__)
         base_path = current_file_path.parents[2]
-        config_files = ['interface.json', 'starfield.json', 'window.json', 'level.json', 'player.json', 'bullet.json', 'enemy_explosion.json', 'player_explosion.json','texts.json']
-        config_attrs = ['config_interface', 'config_starfield', 'config_window', 'config_level', 'config_player', 'config_bullet', 'config_enemy_explosion', 'config_player_explosion', 'config_texts']
+        config_files = ['interface.json', 'starfield.json', 'window.json', 'level.json', 'player.json', 'bullet.json', 'enemy_explosion.json', 'player_explosion.json','texts.json','enemies_list.json','enemy.json']
+        config_attrs = ['config_interface', 'config_starfield', 'config_window', 'config_level', 'config_player', 'config_bullet', 'config_enemy_explosion', 'config_player_explosion', 'config_texts', 'config_enemies_list', 'config_enemy']
 
         
         for file, attr in zip(config_files, config_attrs):
