@@ -2,11 +2,8 @@ import esper
 import pygame
 import random
 
-<<<<<<< HEAD
 from src.ecs.components.c_animation import CAnimation
-=======
 from src.ecs.components.c_blink import CBlink
->>>>>>> main
 from src.ecs.components.c_input_command import CInputCommand
 from src.ecs.components.c_static_image import CStaticImage
 from src.ecs.components.c_star import CStar
@@ -14,14 +11,11 @@ from src.ecs.components.c_surface import CSurface
 from src.ecs.components.c_text import CText
 from src.ecs.components.c_transform import CTransform
 from src.ecs.components.c_velocity import CVelocity
-<<<<<<< HEAD
 from src.ecs.components.tags.c_tag_bullet import CTagBullet
 from src.ecs.components.tags.c_tag_explosion import CTagExplosion
-=======
 from src.ecs.components.tags.c_tag_flag import CTagFlag
 from src.ecs.components.tags.c_tag_life import CTagLife
 
->>>>>>> main
 from src.ecs.components.tags.c_tag_player import CTagPlayer
 from src.engine.service_locator import ServiceLocator
 
@@ -77,9 +71,7 @@ def create_input_player(world: esper.World) -> None:
 
     world.add_component(input_left, CInputCommand(name="PLAYER_LEFT", key=pygame.K_LEFT))
     world.add_component(input_right, CInputCommand(name="PLAYER_RIGHT", key=pygame.K_RIGHT))
-<<<<<<< HEAD
     world.add_component(input_fire, CInputCommand(name="PLAYER_FIRE", key=pygame.K_z))
-=======
 
 def create_text(world:esper.World, config_text:dict, config_interface:dict) -> int:
     text_font = ServiceLocator.fonts_service.get(config_text["font"], config_text["size"])
@@ -112,4 +104,3 @@ def create_stars(world:esper.World, config_starfield:dict, config_window:dict):
         star_entity = world.create_entity()
         world.add_component(star_entity, CStar((x, y), star_color, vertical_speed))
         world.add_component(star_entity, CBlink(blink_rate, pygame.time.get_ticks() + int(blink_rate * 1000)))
->>>>>>> main
