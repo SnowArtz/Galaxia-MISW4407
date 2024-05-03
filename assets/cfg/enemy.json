@@ -1,0 +1,81 @@
+{
+    "Enemy1": {
+        "image": "assets/img/invaders_enemy_01.png",
+        "animations": {
+            "number_frames": 5,
+            "list": [
+                {
+                    "name": "MOVE",
+                    "start": 0,
+                    "end": 4,
+                    "framerate": 5
+                },
+                {
+                    "name": "IDLE",
+                    "start": 0,
+                    "end": 0,
+                    "framerate": 1
+                }
+            ]
+        },
+        "velocity_chase": 75,
+        "velocity_back": 10,
+        "velocity_move": 15,
+        "sound_chase": "assets/snd/enemy_launch.ogg"
+    },
+    "Enemy2": {
+        "image": "assets/img/invaders_enemy_02.png",
+        "animations": {
+            "number_frames": 5,
+            "list": [
+                {
+                    "name": "MOVE",
+                    "start": 0,
+                    "end": 4,
+                    "framerate": 5
+                },
+                {
+                    "name": "IDLE",
+                    "start": 0,
+                    "end": 0,
+                    "framerate": 1
+                }
+            ]
+        },
+        "velocity_chase": 75,
+        "velocity_back": 10,
+        "velocity_move": 15,
+        "sound_chase": "assets/snd/enemy_launch.ogg"
+    },
+    "Enemy3": {
+        "image": "assets/img/invaders_enemy_03.png",
+        "animations": {
+            "number_frames": 5,
+            "list": [
+                {
+                    "name": "MOVE",
+                    "start": 0,
+                    "end": 4,
+                    "framerate": 5
+                },
+                {
+                    "name": "IDLE",
+                    "start": 0,
+                    "end": 0,
+                    "framerate": 1
+                }
+            ]
+        },
+        "velocity_chase": 75,
+        "velocity_back": 10,
+        "velocity_move": 15,
+        "sound_chase": "assets/snd/enemy_launch.ogg"
+    },
+    "Enemy4": {
+        "image": "assets/img/invaders_enemy_04.png",
+        "velocity_chase": 75,
+        "velocity_back": 10,
+        "velocity_move": 15,
+        "sound_chase": "assets/snd/enemy_launch.ogg"
+    }
+}

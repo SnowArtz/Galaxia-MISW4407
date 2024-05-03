@@ -12,12 +12,24 @@ from src.ecs.components.c_text import CText
 from src.ecs.components.c_transform import CTransform
 from src.ecs.components.c_velocity import CVelocity
 from src.ecs.components.tags.c_tag_bullet import CTagBullet
+from src.ecs.components.tags.c_tag_enemy import CTagEnemy
 from src.ecs.components.tags.c_tag_explosion import CTagExplosion
 from src.ecs.components.tags.c_tag_flag import CTagFlag
 from src.ecs.components.tags.c_tag_life import CTagLife
 
 from src.ecs.components.tags.c_tag_player import CTagPlayer
 from src.engine.service_locator import ServiceLocator
+
+def create_enemy(world: esper.World, position: pygame.Vector2, enemy_information: dict) -> int:
+    enemy_surface = ServiceLocator.images_service.get(enemy_information["image"])
+    velocity = pygame.Vector2(enemy_information['velocity_move'], 0)  
+    enemy_entity = create_sprite(world, position, velocity, enemy_surface)
+    world.add_component(enemy_entity, CTagEnemy())  
+    if "animations" in enemy_information:
+        world.add_component(enemy_entity, CAnimation(enemy_information["animations"]))
+
+    return enemy_entity
+
 
 def create_sprite(world: esper.World, position: pygame.Vector2, velocity: pygame.Vector2, surface: pygame.Surface) -> int:
     sprite_entity = world.create_entity()
