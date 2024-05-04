@@ -6,9 +6,9 @@
             "list": [
                 {
                     "name": "MOVE",
-                    "start": 0,
+                    "start": 1,
                     "end": 4,
-                    "framerate": 5
+                    "framerate": 4
                 },
                 {
                     "name": "IDLE",
@@ -30,9 +30,9 @@
             "list": [
                 {
                     "name": "MOVE",
-                    "start": 0,
+                    "start": 1,
                     "end": 4,
-                    "framerate": 5
+                    "framerate": 4
                 },
                 {
                     "name": "IDLE",
@@ -54,9 +54,9 @@
             "list": [
                 {
                     "name": "MOVE",
-                    "start": 0,
+                    "start": 1,
                     "end": 4,
-                    "framerate": 5
+                    "framerate": 4
                 },
                 {
                     "name": "IDLE",
