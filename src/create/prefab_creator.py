@@ -25,14 +25,14 @@ def create_enemy(world: esper.World, position: pygame.Vector2, enemy_information
     enemy_surface = ServiceLocator.images_service.get(enemy_information["image"])
     velocity = pygame.Vector2(enemy_information['velocity_move'], 0)
     if "animations" in enemy_information:
-        enemy_entity = create_sprite(world, pygame.Vector2(position.x-(enemy_surface.get_width()/(enemy_information["animations"]["number_frames"]*2)), position.y+enemy_surface.get_height()/2), velocity, enemy_surface)
+        enemy_entity = create_sprite(world, pygame.Vector2(position.x-(enemy_surface.get_width()/(enemy_information["animations"]["number_frames"]*2)), position.y-enemy_surface.get_height()/2), velocity, enemy_surface)
     else:
         enemy_entity = create_sprite(world, pygame.Vector2(position.x-enemy_surface.get_width()/2, position.y-enemy_surface.get_height()/2), velocity, enemy_surface)
     world.add_component(enemy_entity, CTagEnemy())
     world.add_component(enemy_entity, CGridPosition(row, column))
     
     if "animations" in enemy_information:
-        world.add_component(enemy_entity, CAnimation(enemy_information["animations"]))
+        world.add_component(enemy_entity, CAnimation(enemy_information["animations"], offset=column%3))
 
     return enemy_entity
 

@@ -1,5 +1,6 @@
 import pygame
 import esper
+from src.ecs.components.c_animation import CAnimation
 from src.ecs.components.c_transform import CTransform
 from src.ecs.components.c_velocity import CVelocity
 from src.ecs.components.c_surface import CSurface
@@ -25,7 +26,17 @@ def system_enemy_movement(world: esper.World, screen: pygame.Surface, delta_time
             change_direction = 1
 
     for ent, (transform, velocity, surface, _) in world.get_components(CTransform, CVelocity, CSurface, CTagEnemy):
-
         if change_direction != 0:
-            velocity.velocity.x = abs(velocity.velocity.x) * change_direction  
+            velocity.velocity.x = abs(velocity.velocity.x) * change_direction
         transform.position.x += velocity.velocity.x * delta_time
+        try:
+            animation = world.component_for_entity(ent, CAnimation)
+            if animation.curr_frame in {0, 1, 3}:
+                transform.position.y = transform.initial_position.y
+            elif animation.curr_frame == 2:
+                transform.position.y = transform.initial_position.y - 1
+            elif animation.curr_frame == 4:
+                transform.position.y = transform.initial_position.y - 2
+        except KeyError:
+            pass
+

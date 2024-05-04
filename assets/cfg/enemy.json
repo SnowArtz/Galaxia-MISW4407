@@ -8,7 +8,7 @@
                     "name": "MOVE",
                     "start": 1,
                     "end": 4,
-                    "framerate": 4
+                    "framerate": 2
                 },
                 {
                     "name": "IDLE",
@@ -32,7 +32,7 @@
                     "name": "MOVE",
                     "start": 1,
                     "end": 4,
-                    "framerate": 4
+                    "framerate": 2
                 },
                 {
                     "name": "IDLE",
@@ -56,7 +56,7 @@
                     "name": "MOVE",
                     "start": 1,
                     "end": 4,
-                    "framerate": 4
+                    "framerate": 2
                 },
                 {
                     "name": "IDLE",

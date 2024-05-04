@@ -95,7 +95,7 @@ class GameEngine:
         system_update_stars(self.ecs_world, self.delta_time, self.config_window["size"]["h"])
         system_movement(self.ecs_world, self.delta_time)
         system_limit_player(self.ecs_world, self.screen)
-        #system_enemy_movement(self.ecs_world, self.screen, self.delta_time)
+        system_enemy_movement(self.ecs_world, self.screen, self.delta_time)
         system_screen_delete_bullet(self.ecs_world, self.screen)
         system_enemy_spawner(self.ecs_world, self.config_enemy, self.config_enemies_list)
         system_collision_bullet_enemy(self.ecs_world, self._bullet_entity, self.config_enemy_explosion)
