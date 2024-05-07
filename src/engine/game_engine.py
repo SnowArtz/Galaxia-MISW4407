@@ -50,6 +50,7 @@ class GameEngine:
         self.frame_rate = self.config_window["framerate"]
         self.max_bullets = 1
         self._bullet_entity = None
+        self.active_keys = set()
 
 
     def run(self) -> None:
@@ -121,16 +122,30 @@ class GameEngine:
 
 
     def _do_action(self, c_input: CInputCommand, mouse_x:int = 0, mouse_y:int = 0):
-        if c_input.name == "PLAYER_LEFT":
+        if c_input.name == "PLAYER_LEFT_kl" or c_input.name == "PLAYER_LEFT_a" or c_input.name == "PLAYER_RIGHT_d" or c_input.name == "PLAYER_RIGHT_kr":
+            #Agregar teclas activas y eliminar inactivas
             if c_input.phase == CommandPhase.START:
-                self._player_c_velocity.velocity.x -= self.config_player["input_velocity"]
+                self.active_keys.add(c_input.name)
             elif c_input.phase == CommandPhase.END:
-                self._player_c_velocity.velocity.x += self.config_player["input_velocity"]
-        elif c_input.name == "PLAYER_RIGHT":
-            if c_input.phase == CommandPhase.START:
-                self._player_c_velocity.velocity.x += self.config_player["input_velocity"]
-            elif c_input.phase == CommandPhase.END:
-                self._player_c_velocity.velocity.x -= self.config_player["input_velocity"]
+                self.active_keys.discard(c_input.name)
+            #Verificar casos y asignar velocidad
+            if {"PLAYER_LEFT_kl"} & self.active_keys and not {"PLAYER_LEFT_a", "PLAYER_RIGHT_kr", "PLAYER_RIGHT_d"} & self.active_keys:
+                self._player_c_velocity.velocity.x = -self.config_player["input_velocity"]
+            elif {"PLAYER_LEFT_a"} & self.active_keys and not {"PLAYER_LEFT_kl", "PLAYER_RIGHT_kr", "PLAYER_RIGHT_d"} & self.active_keys:
+                self._player_c_velocity.velocity.x = -self.config_player["input_velocity"]
+            elif {"PLAYER_RIGHT_d"} & self.active_keys and not {"PLAYER_LEFT_kl", "PLAYER_RIGHT_kr", "PLAYER_LEFT_a"} & self.active_keys:
+                self._player_c_velocity.velocity.x = self.config_player["input_velocity"]
+            elif {"PLAYER_RIGHT_kr"} & self.active_keys and not {"PLAYER_LEFT_kl", "PLAYER_RIGHT_d", "PLAYER_LEFT_a"} & self.active_keys:
+                self._player_c_velocity.velocity.x = self.config_player["input_velocity"]
+            elif {"PLAYER_RIGHT_kr"} & self.active_keys and {"PLAYER_RIGHT_d"} & self.active_keys and not {"PLAYER_LEFT_kl", "PLAYER_LEFT_a"} & self.active_keys:
+                self._player_c_velocity.velocity.x = self.config_player["input_velocity"]
+            elif {"PLAYER_LEFT_kl"} & self.active_keys and {"PLAYER_LEFT_a"} & self.active_keys and not {"PLAYER_RIGHT_kr", "PLAYER_RIGHT_d"} & self.active_keys:
+                self._player_c_velocity.velocity.x = -self.config_player["input_velocity"]
+            else:
+                self._player_c_velocity.velocity.x = 0
+
+
+
         elif c_input.name == "PLAYER_FIRE":
             num_components = len(self.ecs_world.get_components(CTagBullet))
             if num_components != 0:
