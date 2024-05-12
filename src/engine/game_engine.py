@@ -6,6 +6,7 @@ import pygame
 from pathlib import Path
 
 from src.create.prefab_creator import create_bullet, create_input_player, create_level_flags, create_lives_display, create_player, create_text, create_stars
+from src.ecs.components.c_cooldown import CCooldown
 from src.ecs.components.c_enemy_spawner import CEnemySpawner
 from src.ecs.components.c_input_command import CInputCommand, CommandPhase
 from src.ecs.components.c_surface import CSurface
@@ -14,11 +15,14 @@ from src.ecs.components.c_velocity import CVelocity
 from src.ecs.components.tags.c_tag_bullet import CTagBullet
 from src.ecs.systems.s_animation import system_animation
 from src.ecs.systems.s_blink_text import system_blinking_text
+from src.ecs.systems.s_choose_enemy_attack import system_choose_enemy_attack
 from src.ecs.systems.s_collision_bullet_enemy import system_collision_bullet_enemy
 from src.ecs.systems.s_collision_bullet_player import system_collision_bullet_player
 from src.ecs.systems.s_collision_player_enemy import system_collision_player_enemy
+from src.ecs.systems.s_cooldown import system_cooldown
 from src.ecs.systems.s_enemy_movement import system_enemy_movement
 from src.ecs.systems.s_enemy_spawner import system_enemy_spawner
+from src.ecs.systems.s_enemy_state import system_enemy_state
 from src.ecs.systems.s_explosion import system_explosion
 from src.ecs.systems.s_input_player import system_input_player
 from src.ecs.systems.s_limit_player import system_limit_player
@@ -27,6 +31,7 @@ from src.ecs.systems.s_player_bullet import system_player_bullet
 from src.ecs.systems.s_render_flags import system_render_flags
 from src.ecs.systems.s_render_lives import system_render_lives
 from src.ecs.systems.s_render_stars import system_render_stars
+from src.ecs.systems.s_render_text import system_render_text
 from src.ecs.systems.s_rendering import system_rendering
 from src.ecs.systems.s_screen_delete_bullet import system_screen_delete_bullet
 from src.engine.service_locator import ServiceLocator
@@ -52,7 +57,8 @@ class GameEngine:
         self.max_bullets = 1
         self._bullet_entity = None
         self.paused_text_entity = None
-        
+        self.global_state = self.ecs_world.create_entity()
+        self.ecs_world.add_component(self.global_state, CCooldown(10))
 
 
     def run(self) -> None:
@@ -124,8 +130,12 @@ class GameEngine:
             system_collision_player_enemy(self.ecs_world, self._player_entity, self.config_level, self.config_player_explosion)
             system_explosion(self.ecs_world)
             system_animation(self.ecs_world, self.delta_time)
+            system_choose_enemy_attack(self.ecs_world)
+            system_cooldown(world=self.ecs_world, delta_time=self.delta_time)
+            system_enemy_state(world=self.ecs_world, delta_time=self.delta_time, screen_height=self.screen.get_rect().height, screen_width=self.screen.get_rect().width)
             self._bullet_entity = system_player_bullet(self.ecs_world, pygame.Vector2(self._player_c_transform.position.x + self._player_c_surface.area.width/2, self._player_c_transform.position.y), self.config_bullet)
             self.ecs_world._clear_dead_entities()
+        
 
 
     def _draw(self):
@@ -134,6 +144,7 @@ class GameEngine:
         system_rendering(self.ecs_world, self.screen)
         system_render_lives(self.ecs_world, self.screen, self.lives)
         system_render_flags(self.ecs_world, self.screen, self.level)    
+        system_render_text(self.ecs_world, self.screen)
         pygame.display.flip()
 
     def _clean(self):
@@ -164,10 +175,7 @@ class GameEngine:
                         direction = direction.normalize()
                         self._bullet_c_v.velocity = direction*self.config_bullet["velocity"]
                         ServiceLocator.sounds_service.play(self.config_bullet["sound"])
-
-
-                    
-
+                        
     def _load_configurations(self):
         current_file_path = Path(__file__)
         base_path = current_file_path.parents[2]
