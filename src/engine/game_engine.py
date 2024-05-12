@@ -13,6 +13,7 @@ from src.ecs.components.c_transform import CTransform
 from src.ecs.components.c_velocity import CVelocity
 from src.ecs.components.tags.c_tag_bullet import CTagBullet
 from src.ecs.systems.s_animation import system_animation
+from src.ecs.systems.s_blink_text import system_blinking_text
 from src.ecs.systems.s_collision_bullet_enemy import system_collision_bullet_enemy
 from src.ecs.systems.s_collision_bullet_player import system_collision_bullet_player
 from src.ecs.systems.s_collision_player_enemy import system_collision_player_enemy
@@ -51,7 +52,7 @@ class GameEngine:
         self.max_bullets = 1
         self._bullet_entity = None
         self.active_keys = set()
-
+        self.paused_text_entity = None
 
     def run(self) -> None:
         self._create()
@@ -79,6 +80,7 @@ class GameEngine:
         create_text(self.ecs_world, self.config_texts["HIGH_SCORE"], self.config_interface)
         create_text(self.ecs_world, self.config_texts["HIGH_SCORE_VALUE"], self.config_interface)
         
+        
         create_lives_display(self.ecs_world)
         create_level_flags(self.ecs_world)
 
@@ -91,21 +93,38 @@ class GameEngine:
             system_input_player(self.ecs_world, event, self._do_action, self.is_paused)
             if event.type == pygame.QUIT:
                 self.is_running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    if not self.is_paused:
+                        self.is_paused = True
+                        # Crear el texto de pausa con parpadeo
+                        self.paused_text_entity = create_text(self.ecs_world, self.config_texts["PAUSED"], self.config_interface, blink=True, blink_rate=0.5)
+                        ServiceLocator.sounds_service.play(self.config_interface["sound"])
+                    else:
+                        self.is_paused = False
+                        if self.paused_text_entity:
+                            self.ecs_world.delete_entity(self.paused_text_entity)
+                            self.paused_text_entity = None  
+
+
 
     def _update(self):
         system_update_stars(self.ecs_world, self.delta_time, self.config_window["size"]["h"])
-        system_movement(self.ecs_world, self.delta_time)
-        system_limit_player(self.ecs_world, self.screen)
-        system_enemy_movement(self.ecs_world, self.screen, self.delta_time)
-        system_screen_delete_bullet(self.ecs_world, self.screen)
-        system_enemy_spawner(self.ecs_world, self.config_enemy, self.config_enemies_list)
-        system_collision_bullet_enemy(self.ecs_world, self._bullet_entity, self.config_enemy_explosion)
-        system_collision_bullet_player(self.ecs_world, self._bullet_entity, self.config_player_explosion)
-        system_collision_player_enemy(self.ecs_world, self._player_entity, self.config_level, self.config_player_explosion)
-        system_explosion(self.ecs_world)
-        system_animation(self.ecs_world, self.delta_time)
-        self._bullet_entity = system_player_bullet(self.ecs_world, pygame.Vector2(self._player_c_transform.position.x + self._player_c_surface.area.width/2, self._player_c_transform.position.y), self.config_bullet)
-        self.ecs_world._clear_dead_entities()
+        if self.is_paused:
+            system_blinking_text(self.ecs_world, self.delta_time)
+        else:
+            system_movement(self.ecs_world, self.delta_time)
+            system_limit_player(self.ecs_world, self.screen)
+            system_enemy_movement(self.ecs_world, self.screen, self.delta_time)
+            system_screen_delete_bullet(self.ecs_world, self.screen)
+            system_enemy_spawner(self.ecs_world, self.config_enemy, self.config_enemies_list)
+            system_collision_bullet_enemy(self.ecs_world, self._bullet_entity, self.config_enemy_explosion)
+            system_collision_bullet_player(self.ecs_world, self._bullet_entity, self.config_player_explosion)
+            system_collision_player_enemy(self.ecs_world, self._player_entity, self.config_level, self.config_player_explosion)
+            system_explosion(self.ecs_world)
+            system_animation(self.ecs_world, self.delta_time)
+            self._bullet_entity = system_player_bullet(self.ecs_world, pygame.Vector2(self._player_c_transform.position.x + self._player_c_surface.area.width/2, self._player_c_transform.position.y), self.config_bullet)
+            self.ecs_world._clear_dead_entities()
 
 
     def _draw(self):
@@ -113,7 +132,7 @@ class GameEngine:
         system_render_stars(self.ecs_world, self.screen)
         system_rendering(self.ecs_world, self.screen)
         system_render_lives(self.ecs_world, self.screen, self.lives)
-        system_render_flags(self.ecs_world, self.screen, self.level)
+        system_render_flags(self.ecs_world, self.screen, self.level)    
         pygame.display.flip()
 
     def _clean(self):

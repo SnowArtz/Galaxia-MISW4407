@@ -89,17 +89,22 @@ def create_input_player(world: esper.World) -> None:
     input_right_kr = world.create_entity()
     input_right_d = world.create_entity()
     input_fire = world.create_entity()
+    input_paused= world.create_entity()
     world.add_component(input_left_kl, CInputCommand(name="PLAYER_LEFT_kl", key=pygame.K_LEFT))
     world.add_component(input_left_a, CInputCommand(name="PLAYER_LEFT_a", key=pygame.K_a))
     world.add_component(input_right_kr, CInputCommand(name="PLAYER_RIGHT_kr", key=pygame.K_RIGHT))
     world.add_component(input_right_d, CInputCommand(name="PLAYER_RIGHT_d", key=pygame.K_d))
     world.add_component(input_fire, CInputCommand(name="PLAYER_FIRE", key=pygame.K_z))
+    world.add_component(input_paused, CInputCommand(name="PAUSED", key=pygame.K_p))
 
-def create_text(world:esper.World, config_text:dict, config_interface:dict) -> int:
+def create_text(world: esper.World, config_text: dict, config_interface: dict, blink: bool = False, blink_rate: float = 1.0) -> int:
     text_font = ServiceLocator.fonts_service.get(config_text["font"], config_text["size"])
     font_entity = world.create_entity()
     world.add_component(font_entity, CText(font=text_font, text=config_text["content"], color=pygame.Color(tuple(config_interface[config_text["color"]].values()))))
     world.add_component(font_entity, CTransform(position=pygame.Vector2(tuple(config_text["position"].values()))))
+    if blink:
+        world.add_component(font_entity, CBlink(blink_rate, blink_rate))
+    
     return font_entity
 
 def create_lives_display(world: esper.World)-> int:

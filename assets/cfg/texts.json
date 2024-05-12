@@ -40,5 +40,17 @@
                 "y": 28
             }
         }
+        ,
+        "PAUSED":{
+            "content": "PAUSED",
+            "font": "assets/fnt/PressStart2P.ttf",
+            "size": 8,
+            "color": "title_text_color",
+            "position": {
+                "x": 104,
+                "y": 156
+            }
+        }
+
     }
 }
