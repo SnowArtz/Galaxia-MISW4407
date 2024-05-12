@@ -88,13 +88,16 @@ def create_player_explosion_sprite(world:esper.World, enemy_entity:int, player_e
 
 
 def create_input_player(world: esper.World) -> None:
-    input_left = world.create_entity()
-    input_right = world.create_entity()
+    input_left_kl = world.create_entity()
+    input_left_a = world.create_entity()
+    input_right_kr = world.create_entity()
+    input_right_d = world.create_entity()
     input_fire = world.create_entity()
     input_paused= world.create_entity()
-
-    world.add_component(input_left, CInputCommand(name="PLAYER_LEFT", key=pygame.K_LEFT))
-    world.add_component(input_right, CInputCommand(name="PLAYER_RIGHT", key=pygame.K_RIGHT))
+    world.add_component(input_left_kl, CInputCommand(name="PLAYER_LEFT_kl", key=pygame.K_LEFT))
+    world.add_component(input_left_a, CInputCommand(name="PLAYER_LEFT_a", key=pygame.K_a))
+    world.add_component(input_right_kr, CInputCommand(name="PLAYER_RIGHT_kr", key=pygame.K_RIGHT))
+    world.add_component(input_right_d, CInputCommand(name="PLAYER_RIGHT_d", key=pygame.K_d))
     world.add_component(input_fire, CInputCommand(name="PLAYER_FIRE", key=pygame.K_z))
     world.add_component(input_paused, CInputCommand(name="PAUSED", key=pygame.K_p))
 
