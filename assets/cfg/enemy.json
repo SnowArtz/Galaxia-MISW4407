@@ -21,7 +21,11 @@
         "velocity_chase": 75,
         "velocity_back": 10,
         "velocity_move": 15,
-        "sound_chase": "assets/snd/enemy_launch.ogg"
+        "sound_chase": "assets/snd/enemy_launch.ogg",
+        "score": {
+            "IDLE": 30,
+            "default": 60
+        }
     },
     "Enemy2": {
         "image": "assets/img/invaders_enemy_02.png",
@@ -45,7 +49,11 @@
         "velocity_chase": 75,
         "velocity_back": 10,
         "velocity_move": 15,
-        "sound_chase": "assets/snd/enemy_launch.ogg"
+        "sound_chase": "assets/snd/enemy_launch.ogg",
+        "score": {
+            "IDLE": 40,
+            "default": 80
+        }
     },
     "Enemy3": {
         "image": "assets/img/invaders_enemy_03.png",
@@ -69,13 +77,21 @@
         "velocity_chase": 75,
         "velocity_back": 10,
         "velocity_move": 15,
-        "sound_chase": "assets/snd/enemy_launch.ogg"
+        "sound_chase": "assets/snd/enemy_launch.ogg",
+        "score": {
+            "IDLE": 50,
+            "default": 100
+        }
     },
     "Enemy4": {
         "image": "assets/img/invaders_enemy_04.png",
         "velocity_chase": 75,
         "velocity_back": 10,
         "velocity_move": 15,
-        "sound_chase": "assets/snd/enemy_launch.ogg"
+        "sound_chase": "assets/snd/enemy_launch.ogg",
+        "score": {
+            "IDLE": 100,
+            "default": 300
+        }
     }
 }
