@@ -34,6 +34,7 @@ from src.ecs.systems.s_render_stars import system_render_stars
 from src.ecs.systems.s_render_text import system_render_text
 from src.ecs.systems.s_rendering import system_rendering
 from src.ecs.systems.s_screen_delete_bullet import system_screen_delete_bullet
+from src.ecs.systems.s_update_score import system_update_score
 from src.engine.service_locator import ServiceLocator
 from src.ecs.systems.s_update_stars import system_update_stars
 
@@ -60,6 +61,7 @@ class GameEngine:
         self.paused_text_entity = None
         self.global_state = self.ecs_world.create_entity()
         self.ecs_world.add_component(self.global_state, CCooldown(10))
+        self.global_score=0
 
     def run(self) -> None:
         self._create()
@@ -83,13 +85,13 @@ class GameEngine:
         self.ecs_world.add_component(spawner_entity, CEnemySpawner(self.config_enemies_list['enemy_spawn_events']))
         
         create_text(self.ecs_world, self.config_texts["1UP"], self.config_interface)
-        create_text(self.ecs_world, self.config_texts["SCORE"], self.config_interface)
+        self.score_entity = create_text(self.ecs_world, self.config_texts["SCORE"], self.config_interface)
         create_text(self.ecs_world, self.config_texts["HIGH_SCORE"], self.config_interface)
         create_text(self.ecs_world, self.config_texts["HIGH_SCORE_VALUE"], self.config_interface)
         
-        
         create_lives_display(self.ecs_world)
         create_level_flags(self.ecs_world)
+
 
     def _calculate_time(self):
         self.clock.tick(self.frame_rate)
@@ -125,15 +127,16 @@ class GameEngine:
             system_enemy_movement(self.ecs_world, self.screen, self.delta_time)
             system_screen_delete_bullet(self.ecs_world, self.screen)
             system_enemy_spawner(self.ecs_world, self.config_enemy, self.config_enemies_list)
-            system_collision_bullet_enemy(self.ecs_world, self._bullet_entity, self.config_enemy_explosion)
+            system_collision_bullet_enemy(self.ecs_world, self._bullet_entity, self.config_enemy_explosion, self.update_global_score)
             system_collision_bullet_player(self.ecs_world, self._bullet_entity, self.config_player_explosion)
-            system_collision_player_enemy(self.ecs_world, self._player_entity, self.config_level, self.config_player_explosion)
+            system_collision_player_enemy(self.ecs_world, self._player_entity, self.config_level, self.config_player_explosion, self.update_global_score)
             system_explosion(self.ecs_world)
             system_animation(self.ecs_world, self.delta_time)
             system_choose_enemy_attack(self.ecs_world)
             system_cooldown(world=self.ecs_world, delta_time=self.delta_time)
             system_enemy_state(world=self.ecs_world, delta_time=self.delta_time, screen_height=self.screen.get_rect().height, screen_width=self.screen.get_rect().width)
             self._bullet_entity = system_player_bullet(self.ecs_world, pygame.Vector2(self._player_c_transform.position.x + self._player_c_surface.area.width/2, self._player_c_transform.position.y), self.config_bullet)
+            system_update_score(self.ecs_world, self.global_score, self.score_entity, self.config_texts)
             self.ecs_world._clear_dead_entities()
         
 
@@ -189,6 +192,9 @@ class GameEngine:
                         direction = direction.normalize()
                         self._bullet_c_v.velocity = direction*self.config_bullet["velocity"]
                         ServiceLocator.sounds_service.play(self.config_bullet["sound"])
+
+    def update_global_score(self, score):
+        self.global_score += score
                         
     def _load_configurations(self):
         current_file_path = Path(__file__)
