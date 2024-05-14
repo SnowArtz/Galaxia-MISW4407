@@ -34,6 +34,7 @@ from src.ecs.systems.s_render_stars import system_render_stars
 from src.ecs.systems.s_render_text import system_render_text
 from src.ecs.systems.s_rendering import system_rendering
 from src.ecs.systems.s_screen_delete_bullet import system_screen_delete_bullet
+from src.ecs.systems.s_update_high_score import system_update_high_score
 from src.ecs.systems.s_update_score import system_update_score
 from src.engine.service_locator import ServiceLocator
 from src.ecs.systems.s_update_stars import system_update_stars
@@ -62,6 +63,7 @@ class GameEngine:
         self.global_state = self.ecs_world.create_entity()
         self.ecs_world.add_component(self.global_state, CCooldown(10))
         self.global_score=0
+        
 
     def run(self) -> None:
         self._create()
@@ -87,7 +89,7 @@ class GameEngine:
         create_text(self.ecs_world, self.config_texts["1UP"], self.config_interface)
         self.score_entity = create_text(self.ecs_world, self.config_texts["SCORE"], self.config_interface)
         create_text(self.ecs_world, self.config_texts["HIGH_SCORE"], self.config_interface)
-        create_text(self.ecs_world, self.config_texts["HIGH_SCORE_VALUE"], self.config_interface)
+        self.high_score_text_entity=create_text(self.ecs_world, self.config_texts["HIGH_SCORE_VALUE"], self.config_interface)
         
         create_lives_display(self.ecs_world)
         create_level_flags(self.ecs_world)
@@ -137,6 +139,7 @@ class GameEngine:
             system_enemy_state(world=self.ecs_world, delta_time=self.delta_time, screen_height=self.screen.get_rect().height, screen_width=self.screen.get_rect().width)
             self._bullet_entity = system_player_bullet(self.ecs_world, pygame.Vector2(self._player_c_transform.position.x + self._player_c_surface.area.width/2, self._player_c_transform.position.y), self.config_bullet)
             system_update_score(self.ecs_world, self.global_score, self.score_entity, self.config_texts)
+            system_update_high_score(self.ecs_world, self.global_score, self.config_texts, self.high_score_text_entity)
             self.ecs_world._clear_dead_entities()
         
 
@@ -195,6 +198,8 @@ class GameEngine:
 
     def update_global_score(self, score):
         self.global_score += score
+
+        
                         
     def _load_configurations(self):
         current_file_path = Path(__file__)
@@ -217,4 +222,3 @@ class GameEngine:
         self.config_window
         self.config_level
         self.config_player
-        self.config_texts = self.config_texts["texts"]
