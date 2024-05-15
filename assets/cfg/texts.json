@@ -9,13 +9,33 @@
             "y": 20
         }
     },
-    "SCORE": {
+    "2UP": {
+        "content": "2UP",
+        "font": "assets/fnt/PressStart2P.ttf",
+        "size": 8,
+        "color": "title_text_color",
+        "position": {
+            "x": 190,
+            "y": 20
+        }
+    },
+    "SCORE_P1": {
         "content": "00",
         "font": "assets/fnt/PressStart2P.ttf",
         "size": 8,
         "color": "normal_text_color",
         "position": {
             "x": 65,
+            "y": 28
+        }
+    },
+    "SCORE_P2": {
+        "content": "00",
+        "font": "assets/fnt/PressStart2P.ttf",
+        "size": 8,
+        "color": "normal_text_color",
+        "position": {
+            "x": 215,
             "y": 28
         }
     },
@@ -47,6 +67,56 @@
         "position": {
             "x": 104,
             "y": 156
+        }
+    },
+    "1_PLAYER":{
+        "content": "1 PLAYER",
+        "font": "assets/fnt/PressStart2P.ttf",
+        "size": 8,
+        "color": "subtitle_text_color",
+        "position": {
+            "x": 100,
+            "y": 125
+        }
+    },
+    "2_PLAYERS":{
+        "content": "2 PLAYERS",
+        "font": "assets/fnt/PressStart2P.ttf",
+        "size": 8,
+        "color": "subtitle_text_color",
+        "position": {
+            "x": 100,
+            "y": 140
+        }
+    },
+    "PRESS_Z":{
+        "content": "PRESS Z TO START",
+        "font": "assets/fnt/PressStart2P.ttf",
+        "size": 8,
+        "color": "title_text_color",
+        "position": {
+            "x": 70,
+            "y": 170
+        }
+    },
+    "INSTRUCTIONS_1":{
+        "content": "Arrow keys to MOVE ",
+        "font": "assets/fnt/PressStart2P.ttf",
+        "size": 8,
+        "color": "high_score_color",
+        "position": {
+            "x": 60,
+            "y": 200
+        }
+    },
+    "INSTRUCTIONS_2":{
+        "content": "Z to SHOOT - P to PAUSE",
+        "font": "assets/fnt/PressStart2P.ttf",
+        "size": 8,
+        "color": "high_score_color",
+        "position": {
+            "x": 40,
+            "y": 210
         }
     }
 }

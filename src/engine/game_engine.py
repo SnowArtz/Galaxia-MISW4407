@@ -38,6 +38,7 @@ from src.ecs.systems.s_update_high_score import system_update_high_score
 from src.ecs.systems.s_update_score import system_update_score
 from src.engine.service_locator import ServiceLocator
 from src.ecs.systems.s_update_stars import system_update_stars
+from src.game.menu_scene import MenuScene
 
 class GameEngine:
     def __init__(self) -> None:
@@ -63,20 +64,31 @@ class GameEngine:
         self.global_state = self.ecs_world.create_entity()
         self.ecs_world.add_component(self.global_state, CCooldown(10))
         self.global_score=0
+
+        self._scenes = dict()
+        self._scenes["MENU_SCENE"] = MenuScene(self, self.config_texts, self.config_interface)
+        #self._scenes["GAME_SCENE"] = GameScene(self)
+        self._current_scene = None
+        self._scene_name_to_switch = None
         
 
-    def run(self) -> None:
-        self._create()
+    def run(self, start_scene_name: str) -> None:
         self.is_running = True
+        self._current_scene = self._scenes[start_scene_name]
+        self._create()
         while self.is_running:
             self._calculate_time()
             self._process_events()
             self._update()
             self._draw()
+            self._handle_switch_scene()
         self._clean()
 
     def _create(self):
-        create_stars(self.ecs_world, self.config_starfield, self.config_window)
+
+        self._current_scene.do_create()
+        ###
+        """ create_stars(self.ecs_world, self.config_starfield, self.config_window)
         self._player_entity = create_player(self.ecs_world, pygame.Vector2(self.config_level['player_spawn']["position"]["x"], self.config_level['player_spawn']["position"]["y"]), self.config_player)
         self._player_c_velocity = self.ecs_world.component_for_entity(self._player_entity, CVelocity)
         self._player_c_transform = self.ecs_world.component_for_entity(self._player_entity, CTransform)
@@ -87,12 +99,12 @@ class GameEngine:
         self.ecs_world.add_component(spawner_entity, CEnemySpawner(self.config_enemies_list['enemy_spawn_events']))
         
         create_text(self.ecs_world, self.config_texts["1UP"], self.config_interface)
-        self.score_entity = create_text(self.ecs_world, self.config_texts["SCORE"], self.config_interface)
+        self.score_entity = create_text(self.ecs_world, self.config_texts["SCORE_P1"], self.config_interface)
         create_text(self.ecs_world, self.config_texts["HIGH_SCORE"], self.config_interface)
         self.high_score_text_entity=create_text(self.ecs_world, self.config_texts["HIGH_SCORE_VALUE"], self.config_interface)
         
         create_lives_display(self.ecs_world)
-        create_level_flags(self.ecs_world)
+        create_level_flags(self.ecs_world) """
 
 
     def _calculate_time(self):
@@ -101,7 +113,13 @@ class GameEngine:
 
     def _process_events(self):
         for event in pygame.event.get():
-            system_input_player(self.ecs_world, event, self._do_action, self.is_paused)
+            self._current_scene.do_process_events(event)
+            if event.type == pygame.QUIT:
+                self.is_running = False
+            ###
+
+
+            """ system_input_player(self.ecs_world, event, self._do_action, self.is_paused)
             if event.type == pygame.QUIT:
                 self.is_running = False
             elif event.type == pygame.KEYDOWN:
@@ -115,12 +133,16 @@ class GameEngine:
                         self.is_paused = False
                         if self.paused_text_entity:
                             self.ecs_world.delete_entity(self.paused_text_entity)
-                            self.paused_text_entity = None  
+                            self.paused_text_entity = None   """
 
 
 
     def _update(self):
-        system_update_stars(self.ecs_world, self.delta_time, self.config_window["size"]["h"])
+
+        self._current_scene.simulate(self.delta_time)
+        ###
+
+        """ system_update_stars(self.ecs_world, self.delta_time, self.config_window["size"]["h"])
         if self.is_paused:
             system_blinking_text(self.ecs_world, self.delta_time)
         else:
@@ -140,26 +162,44 @@ class GameEngine:
             self._bullet_entity = system_player_bullet(self.ecs_world, pygame.Vector2(self._player_c_transform.position.x + self._player_c_surface.area.width/2, self._player_c_transform.position.y), self.config_bullet)
             system_update_score(self.ecs_world, self.global_score, self.score_entity, self.config_texts)
             system_update_high_score(self.ecs_world, self.global_score, self.config_texts, self.high_score_text_entity)
-            self.ecs_world._clear_dead_entities()
+            self.ecs_world._clear_dead_entities() """
         
 
 
     def _draw(self):
+
         self.screen.fill((self.config_window['bg_color']['r'], self.config_window['bg_color']['g'], self.config_window['bg_color']['b']))
+        self._current_scene.do_draw(self.screen)
+        pygame.display.flip()
+
+        ###
+
+        """ self.screen.fill((self.config_window['bg_color']['r'], self.config_window['bg_color']['g'], self.config_window['bg_color']['b']))
         system_render_stars(self.ecs_world, self.screen)
         system_rendering(self.ecs_world, self.screen)
         system_render_lives(self.ecs_world, self.screen, self.lives)
         system_render_flags(self.ecs_world, self.screen, self.level)    
         system_render_text(self.ecs_world, self.screen)
-        pygame.display.flip()
+        pygame.display.flip() """
 
     def _clean(self):
         self.ecs_world.clear_database()
         pygame.quit()
 
+    def _handle_switch_scene(self):
+        if self._scene_name_to_switch is not None:
+            self._current_scene.clean()
+            self._current_scene = self._scenes[self._scene_name_to_switch]
+            self._current_scene.do_create()
+            self._scene_name_to_switch = None
+
 
     def _do_action(self, c_input: CInputCommand, mouse_x:int = 0, mouse_y:int = 0):
-        if c_input.name == "PLAYER_LEFT_kl" or c_input.name == "PLAYER_LEFT_a" or c_input.name == "PLAYER_RIGHT_d" or c_input.name == "PLAYER_RIGHT_kr":
+        
+        self._current_scene.do_action(c_input, mouse_x, mouse_y)
+        ###
+
+        """ if c_input.name == "PLAYER_LEFT_kl" or c_input.name == "PLAYER_LEFT_a" or c_input.name == "PLAYER_RIGHT_d" or c_input.name == "PLAYER_RIGHT_kr":
             #Agregar teclas activas y eliminar inactivas
             if c_input.phase == CommandPhase.START:
                 self.active_keys.add(c_input.name)
@@ -194,12 +234,16 @@ class GameEngine:
                         direction = pygame.math.Vector2(0, -1)
                         direction = direction.normalize()
                         self._bullet_c_v.velocity = direction*self.config_bullet["velocity"]
-                        ServiceLocator.sounds_service.play(self.config_bullet["sound"])
+                        ServiceLocator.sounds_service.play(self.config_bullet["sound"]) """
+
+
+    def _do_clean(self):
+        if self._current_scene is not None:
+            self._current_scene.clean()
+        pygame.quit()
 
     def update_global_score(self, score):
         self.global_score += score
-
-        
                         
     def _load_configurations(self):
         current_file_path = Path(__file__)
