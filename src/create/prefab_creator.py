@@ -105,29 +105,28 @@ def create_input_player(world: esper.World) -> None:
     world.add_component(input_right_kr, CInputCommand(name="PLAYER_RIGHT_kr", key=pygame.K_RIGHT))
     world.add_component(input_right_d, CInputCommand(name="PLAYER_RIGHT_d", key=pygame.K_d))
     world.add_component(input_fire, CInputCommand(name="PLAYER_FIRE", key=pygame.K_z))
-    world.add_component(input_paused, CInputCommand(name="PAUSED", key=pygame.K_p))
+    world.add_component(input_paused, CInputCommand(name="PAUSE", key=pygame.K_p))
 
 def create_text(world: esper.World, config_text: dict, config_interface: dict, blink: bool = False, blink_rate: float = 1.0) -> int:
     text_font = ServiceLocator.fonts_service.get(config_text["font"], config_text["size"])
     font_entity = world.create_entity()
-    world.add_component(font_entity, CText(font=text_font, text=config_text["content"], color=pygame.Color(tuple(config_interface[config_text["color"]].values()))))
+    world.add_component(font_entity, CText(font=text_font, text=config_text["content"], color=pygame.Color(tuple(config_interface[config_text["color"]].values())), position=pygame.Vector2(tuple(config_text["position"].values()))))
     world.add_component(font_entity, CTransform(position=pygame.Vector2(tuple(config_text["position"].values()))))
     if blink:
         world.add_component(font_entity, CBlink(blink_rate, blink_rate))
     
     return font_entity
 
+def create_static_image(world: esper.World, type: str, position: pygame.Vector2) -> int:
+    image_entity = world.create_entity()
+    world.add_component(image_entity, CStaticImage(type, position))
+    return image_entity
+
 def create_lives_display(world: esper.World)-> int:
-    entity = world.create_entity()
-    world.add_component(entity, CStaticImage("life", pygame.Vector2(168, 25)))
-    world.add_component(entity, CTagLife())
-    return entity
+    return world.add_component(create_static_image(world, "life", pygame.Vector2(168, 25)), CTagLife())
 
 def create_level_flags(world: esper.World) -> int:
-    entity = world.create_entity()
-    world.add_component(entity, CStaticImage("level_flag", pygame.Vector2(200, 21)))
-    world.add_component(entity, CTagFlag())
-    return entity
+    return world.add_component(create_static_image(world, "level_flag", pygame.Vector2(200, 21)), CTagFlag())
   
 def create_stars(world:esper.World, config_starfield:dict, config_window:dict):
     for _ in range(config_starfield["number_of_stars"]):

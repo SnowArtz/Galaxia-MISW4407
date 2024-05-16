@@ -69,7 +69,7 @@
             "y": 156
         }
     },
-    "1_PLAYER":{
+    "1_PLAYER": {
         "content": "1 PLAYER",
         "font": "assets/fnt/PressStart2P.ttf",
         "size": 8,
@@ -79,7 +79,7 @@
             "y": 125
         }
     },
-    "2_PLAYERS":{
+    "2_PLAYERS": {
         "content": "2 PLAYERS",
         "font": "assets/fnt/PressStart2P.ttf",
         "size": 8,
@@ -89,7 +89,7 @@
             "y": 140
         }
     },
-    "PRESS_Z":{
+    "PRESS_Z": {
         "content": "PRESS Z TO START",
         "font": "assets/fnt/PressStart2P.ttf",
         "size": 8,
@@ -99,7 +99,7 @@
             "y": 170
         }
     },
-    "INSTRUCTIONS_1":{
+    "INSTRUCTIONS_1": {
         "content": "Arrow keys to MOVE ",
         "font": "assets/fnt/PressStart2P.ttf",
         "size": 8,
@@ -109,7 +109,7 @@
             "y": 200
         }
     },
-    "INSTRUCTIONS_2":{
+    "INSTRUCTIONS_2": {
         "content": "Z to SHOOT - P to PAUSE",
         "font": "assets/fnt/PressStart2P.ttf",
         "size": 8,

@@ -10,7 +10,7 @@ class Scene:
     def __init__(self, game_engine:'src.engine.game_engine.GameEngine') -> None:
         self.ecs_world = esper.World()
         self._game_engine:src.engine.game_engine.GameEngine = game_engine
-        self.screen_rect = self._game_engine.screen.get_rect()
+        self.screen = self._game_engine.screen
 
     def do_process_events(self, event:pygame.event):
         system_input(self.ecs_world, event, self.do_action)
