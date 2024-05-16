@@ -3,8 +3,6 @@ import json
 import pygame
 
 from pathlib import Path
-from src.ecs.components.c_cooldown import CCooldown
-from src.ecs.components.c_enemy_spawner import CEnemySpawner
 from src.game.menu_scene import MenuScene
 from src.game.play_scene import PlayScene
 from src.ecs.components.c_input_command import CInputCommand
@@ -25,8 +23,6 @@ class GameEngine:
         self.config_texts = None
         self.config_enemies_list = None
         self.config_enemy = None
-        self.tiempo_juego = 0
-
 
         self._load_configurations()
 
@@ -66,8 +62,6 @@ class GameEngine:
     def _calculate_time(self):
         self.clock.tick(self.frame_rate)
         self.delta_time = self.clock.get_time() / 1000.0
-        self.tiempo_juego += self.delta_time
-
 
     def _process_events(self):
         for event in pygame.event.get():

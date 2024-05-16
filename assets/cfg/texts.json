@@ -69,14 +69,14 @@
             "y": 156
         }
     },
-    "GAME_START": {
-        "content": "GAME START",
+    "READY": {
+        "content": "READY",
         "font": "assets/fnt/PressStart2P.ttf",
         "size": 8,
-        "color": "normal_text_color",
+        "color": "title_text_color",
         "position": {
-            "x": 90,
-            "y": 136
+            "x": 104,
+            "y": 156
         },
         "sound": "assets/snd/game_start.ogg"
     },
