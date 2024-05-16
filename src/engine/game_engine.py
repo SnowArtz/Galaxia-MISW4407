@@ -63,6 +63,10 @@ class GameEngine:
         self.global_state = self.ecs_world.create_entity()
         self.ecs_world.add_component(self.global_state, CCooldown(10))
         self.global_score=0
+        self.show_ready_text = True
+        self.ready_text_entity = None
+        self.ready_text_time = 3
+        self.tiempo_juego = 0
         
 
     def run(self) -> None:
@@ -71,11 +75,16 @@ class GameEngine:
         while self.is_running:
             self._calculate_time()
             self._process_events()
+            if self.show_ready_text and self.tiempo_juego >= self.ready_text_time:
+                self._hide_ready_text()
+                spawner_entity = self.ecs_world.create_entity()
+                self.ecs_world.add_component(spawner_entity, CEnemySpawner(self.config_enemies_list['enemy_spawn_events']))
             self._update()
             self._draw()
         self._clean()
 
     def _create(self):
+        self._show_ready_text()
         create_stars(self.ecs_world, self.config_starfield, self.config_window)
         self._player_entity = create_player(self.ecs_world, pygame.Vector2(self.config_level['player_spawn']["position"]["x"], self.config_level['player_spawn']["position"]["y"]), self.config_player)
         self._player_c_velocity = self.ecs_world.component_for_entity(self._player_entity, CVelocity)
@@ -83,9 +92,7 @@ class GameEngine:
         self._player_c_surface = self.ecs_world.component_for_entity(self._player_entity, CSurface)
         create_input_player(self.ecs_world)
         self._bullet_entity = create_bullet(self.ecs_world, pygame.Vector2(0, 0), self.config_bullet)
-        spawner_entity = self.ecs_world.create_entity()
-        self.ecs_world.add_component(spawner_entity, CEnemySpawner(self.config_enemies_list['enemy_spawn_events']))
-        
+
         create_text(self.ecs_world, self.config_texts["1UP"], self.config_interface)
         self.score_entity = create_text(self.ecs_world, self.config_texts["SCORE"], self.config_interface)
         create_text(self.ecs_world, self.config_texts["HIGH_SCORE"], self.config_interface)
@@ -98,6 +105,8 @@ class GameEngine:
     def _calculate_time(self):
         self.clock.tick(self.frame_rate)
         self.delta_time = self.clock.get_time() / 1000.0
+        self.tiempo_juego += self.delta_time
+
 
     def _process_events(self):
         for event in pygame.event.get():
@@ -105,7 +114,7 @@ class GameEngine:
             if event.type == pygame.QUIT:
                 self.is_running = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_p:
+                if event.key == pygame.K_p and self.tiempo_juego >= self.ready_text_time:
                     if not self.is_paused:
                         self.is_paused = True
                         # Crear el texto de pausa con parpadeo
@@ -180,10 +189,7 @@ class GameEngine:
                 self._player_c_velocity.velocity.x = -self.config_player["input_velocity"]
             else:
                 self._player_c_velocity.velocity.x = 0
-
-
-
-        elif c_input.name == "PLAYER_FIRE":
+        elif c_input.name == "PLAYER_FIRE" and self.tiempo_juego >= self.ready_text_time:
             num_components = len(self.ecs_world.get_components(CTagBullet))
             if num_components != 0:
                 bullet_tag = self.ecs_world.component_for_entity(self._bullet_entity, CTagBullet)
@@ -200,14 +206,21 @@ class GameEngine:
         self.global_score += score
 
         
+    def _show_ready_text(self):
+        ServiceLocator.sounds_service.play(self.config_texts["GAME_START"]["sound"])
+        self.show_ready_text = True
+        self.ready_text_entity = create_text(self.ecs_world, self.config_texts["GAME_START"], self.config_interface)
+
+    def _hide_ready_text(self):
+        if self.show_ready_text == True:
+            self.show_ready_text = False
+            self.ecs_world.delete_entity(self.ready_text_entity)
                         
     def _load_configurations(self):
         current_file_path = Path(__file__)
         base_path = current_file_path.parents[2]
         config_files = ['interface.json', 'starfield.json', 'window.json', 'level.json', 'player.json', 'bullet.json', 'enemy_explosion.json', 'player_explosion.json','texts.json','enemies_list.json','enemy.json']
-        config_attrs = ['config_interface', 'config_starfield', 'config_window', 'config_level', 'config_player', 'config_bullet', 'config_enemy_explosion', 'config_player_explosion', 'config_texts', 'config_enemies_list', 'config_enemy']
-
-        
+        config_attrs = ['config_interface', 'config_starfield', 'config_window', 'config_level', 'config_player', 'config_bullet', 'config_enemy_explosion', 'config_player_explosion', 'config_texts', 'config_enemies_list', 'config_enemy'] 
         for file, attr in zip(config_files, config_attrs):
             try:
                 with open(os.path.join(base_path, 'assets', self.config_folder, file)) as f:
