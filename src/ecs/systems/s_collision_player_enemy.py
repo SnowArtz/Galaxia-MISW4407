@@ -5,6 +5,7 @@ from src.ecs.components.c_surface import CSurface
 from src.ecs.components.c_transform import CTransform
 from src.ecs.components.tags.c_tag_enemy import CTagEnemy
 from src.create.prefab_creator import create_player_explosion_sprite
+from src.ecs.systems.s_player_dead import system_player_dead
 
 def system_collision_player_enemy(world: esper.World, player_entity: int, config_level: dict, player_explosion_file: dict, update_global_score):
     componentsE = world.get_components(CSurface, CTransform, CTagEnemy, CScore)
@@ -21,8 +22,5 @@ def system_collision_player_enemy(world: esper.World, player_entity: int, config
             # Antes de eliminar, actualiza el puntaje
             if c_score:  # Asegúrate de que el enemigo tiene un componente CScore
                 update_global_score(c_score.base_score + c_score.state_score)
-            
             world.delete_entity(enemy_entity)
-            pl_t.position.x = pos.x
-            pl_t.position.y = pos.y
-            create_player_explosion_sprite(world, player_entity, player_explosion_file)
+            system_player_dead(world, player_explosion_file, config_level, player_entity)

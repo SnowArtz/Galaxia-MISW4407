@@ -20,6 +20,7 @@ from src.ecs.systems.s_collision_bullet_enemy import system_collision_bullet_ene
 from src.ecs.systems.s_collision_bullet_player import system_collision_bullet_player
 from src.ecs.systems.s_collision_player_enemy import system_collision_player_enemy
 from src.ecs.systems.s_cooldown import system_cooldown
+from src.ecs.systems.s_enemy_bullet import system_enemy_bullet
 from src.ecs.systems.s_enemy_movement import system_enemy_movement
 from src.ecs.systems.s_enemy_spawner import system_enemy_spawner
 from src.ecs.systems.s_enemy_state import system_enemy_state
@@ -130,13 +131,14 @@ class GameEngine:
             system_screen_delete_bullet(self.ecs_world, self.screen)
             system_enemy_spawner(self.ecs_world, self.config_enemy, self.config_enemies_list)
             system_collision_bullet_enemy(self.ecs_world, self._bullet_entity, self.config_enemy_explosion, self.update_global_score)
-            system_collision_bullet_player(self.ecs_world, self._bullet_entity, self.config_player_explosion)
+            system_collision_bullet_player(self.ecs_world, self.config_player_explosion, self.config_level)
             system_collision_player_enemy(self.ecs_world, self._player_entity, self.config_level, self.config_player_explosion, self.update_global_score)
             system_explosion(self.ecs_world)
             system_animation(self.ecs_world, self.delta_time)
-            system_choose_enemy_attack(self.ecs_world)
+            system_choose_enemy_attack(self.ecs_world, self.config_enemy)
             system_cooldown(world=self.ecs_world, delta_time=self.delta_time)
             system_enemy_state(world=self.ecs_world, delta_time=self.delta_time, screen_height=self.screen.get_rect().height, screen_width=self.screen.get_rect().width)
+            system_enemy_bullet(self.ecs_world, self.config_enemy_bullet)
             self._bullet_entity = system_player_bullet(self.ecs_world, pygame.Vector2(self._player_c_transform.position.x + self._player_c_surface.area.width/2, self._player_c_transform.position.y), self.config_bullet)
             system_update_score(self.ecs_world, self.global_score, self.score_entity, self.config_texts)
             system_update_high_score(self.ecs_world, self.global_score, self.config_texts, self.high_score_text_entity)
@@ -180,9 +182,6 @@ class GameEngine:
                 self._player_c_velocity.velocity.x = -self.config_player["input_velocity"]
             else:
                 self._player_c_velocity.velocity.x = 0
-
-
-
         elif c_input.name == "PLAYER_FIRE":
             num_components = len(self.ecs_world.get_components(CTagBullet))
             if num_components != 0:
@@ -198,16 +197,12 @@ class GameEngine:
 
     def update_global_score(self, score):
         self.global_score += score
-
-        
                         
     def _load_configurations(self):
         current_file_path = Path(__file__)
         base_path = current_file_path.parents[2]
-        config_files = ['interface.json', 'starfield.json', 'window.json', 'level.json', 'player.json', 'bullet.json', 'enemy_explosion.json', 'player_explosion.json','texts.json','enemies_list.json','enemy.json']
-        config_attrs = ['config_interface', 'config_starfield', 'config_window', 'config_level', 'config_player', 'config_bullet', 'config_enemy_explosion', 'config_player_explosion', 'config_texts', 'config_enemies_list', 'config_enemy']
-
-        
+        config_files = ['interface.json', 'starfield.json', 'window.json', 'level.json', 'player.json', 'bullet.json', 'enemy_explosion.json', 'player_explosion.json','texts.json','enemies_list.json','enemy.json', 'enemy_bullet.json']
+        config_attrs = ['config_interface', 'config_starfield', 'config_window', 'config_level', 'config_player', 'config_bullet', 'config_enemy_explosion', 'config_player_explosion', 'config_texts', 'config_enemies_list', 'config_enemy', 'config_enemy_bullet']
         for file, attr in zip(config_files, config_attrs):
             try:
                 with open(os.path.join(base_path, 'assets', self.config_folder, file)) as f:
