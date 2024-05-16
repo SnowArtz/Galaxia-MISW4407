@@ -4,6 +4,7 @@ import random
 
 from src.ecs.components.c_animation import CAnimation
 from src.ecs.components.c_blink import CBlink
+from src.ecs.components.c_cooldown import CCooldown
 from src.ecs.components.c_enemy_state import CEnemyState
 from src.ecs.components.c_grid_position import CGridPosition
 from src.ecs.components.c_input_command import CInputCommand
@@ -61,15 +62,17 @@ def create_player(world: esper.World, position: pygame.Vector2, player_informati
     position = pygame.Vector2(position.x-player_surface.get_width()/2, position.y-player_surface.get_height()/2)    
     player_entity = create_sprite(world, position, velocity, player_surface)
     world.add_component(player_entity, CTagPlayer())
+    world.add_component(player_entity, CCooldown(2.5))
     return player_entity
 
-def create_bullet(world:esper.World, position: pygame.Vector2, bullet_information:dict) -> int:
+def create_bullet(world:esper.World, position: pygame.Vector2, bullet_information:dict, cooldown:int = 0) -> int:
     bullet_entity = world.create_entity()
     color = bullet_information['color']
     world.add_component(bullet_entity, CTagBullet(active=False))
     world.add_component(bullet_entity, CTransform(position=position))
     world.add_component(bullet_entity, CVelocity(velocity=pygame.Vector2(0, 0)))
     world.add_component(bullet_entity, CSurface(color=pygame.Color(color['r'], color['g'], color['b']), size=pygame.Vector2(bullet_information["width"],bullet_information["height"])))
+    world.add_component(bullet_entity, CCooldown(cooldown))
     return bullet_entity
 
 def create_enemy_explosion_sprite(world:esper.World, enemy_entity:int, enemy_explosion_file:dict):

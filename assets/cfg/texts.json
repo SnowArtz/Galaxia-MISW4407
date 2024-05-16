@@ -69,6 +69,17 @@
             "y": 156
         }
     },
+    "READY": {
+        "content": "READY",
+        "font": "assets/fnt/PressStart2P.ttf",
+        "size": 8,
+        "color": "title_text_color",
+        "position": {
+            "x": 104,
+            "y": 156
+        },
+        "sound": "assets/snd/game_start.ogg"
+    },
     "1_PLAYER": {
         "content": "1 PLAYER",
         "font": "assets/fnt/PressStart2P.ttf",

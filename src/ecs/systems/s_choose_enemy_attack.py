@@ -6,11 +6,10 @@ from src.ecs.components.tags.c_tag_enemy import CTagEnemy
 import random
 import pygame
 
-def system_choose_enemy_attack(world:esper.World):
-    global_cooldown = world.component_for_entity(world.get_component(CCooldown)[0][0], CCooldown)
-    current_time = pygame.time.get_ticks() / 1000
+def system_choose_enemy_attack(world:esper.World, entity):
+    global_cooldown = world.component_for_entity(entity, CCooldown)
 
-    if current_time - global_cooldown.current_time < global_cooldown.cooldown_time:
+    if global_cooldown.current_time  > 0.1 :
         return
 
     components = world.get_components(CTagEnemy, CGridPosition, CEnemyState)
@@ -37,4 +36,4 @@ def system_choose_enemy_attack(world:esper.World):
         world.component_for_entity(random_attacker[0], CEnemyState).emerge_direction = -1
     else:
         world.component_for_entity(random_attacker[0], CEnemyState).emerge_direction = 1
-    global_cooldown.current_time = current_time
+    global_cooldown.current_time = global_cooldown.cooldown_time
