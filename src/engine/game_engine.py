@@ -1,5 +1,6 @@
 import os
 import json
+import esper
 import pygame
 
 from pathlib import Path
@@ -27,6 +28,8 @@ class GameEngine:
 
         self._load_configurations()
 
+        self.ecs_world = esper.World()
+
         pygame.init()
         self.screen = pygame.display.set_mode((self.config_window["size"]["w"], self.config_window["size"]["h"]), pygame.SCALED)
         pygame.display.set_caption(self.config_window["title"])
@@ -37,8 +40,8 @@ class GameEngine:
         self.frame_rate = self.config_window["framerate"]
        
         self._scenes = dict()
-        self._scenes["MENU_SCENE"] = MenuScene(self, self.config_texts, self.config_interface)
-        self._scenes["PLAY_SCENE"] = PlayScene(self, self.config_interface, self.config_starfield, self.config_window, self.config_level, self.config_player, self.config_bullet, self.config_enemy_explosion, self.config_player_explosion, self.config_texts, self.config_enemies_list, self.config_enemy, self.config_enemy_bullet)
+        self._scenes["MENU_SCENE"] = MenuScene(self, self.ecs_world, self.config_texts, self.config_interface)
+        self._scenes["PLAY_SCENE"] = PlayScene(self, self.ecs_world, self.config_interface, self.config_starfield, self.config_window, self.config_level, self.config_player, self.config_bullet, self.config_enemy_explosion, self.config_player_explosion, self.config_texts, self.config_enemies_list, self.config_enemy, self.config_enemy_bullet)
         self._current_scene = None
         self._scene_name_to_switch = None
         
@@ -84,7 +87,7 @@ class GameEngine:
 
     def _handle_switch_scene(self):
         if self._scene_name_to_switch is not None:
-            self._current_scene.clean()
+            self._current_scene.do_clean()
             self._current_scene = self._scenes[self._scene_name_to_switch]
             self._current_scene.do_create()
             self._scene_name_to_switch = None

@@ -2,6 +2,8 @@ import pygame
 
 
 from src.ecs.components.c_timer import CTimer
+from src.ecs.components.tags.c_tag_flag import CTagFlag
+from src.ecs.components.tags.c_tag_life import CTagLife
 from src.ecs.systems.s_enemy_bullet import system_enemy_bullet
 from src.engine.scenes.scene import Scene
 from src.ecs.components.c_surface import CSurface
@@ -43,8 +45,8 @@ from src.create.prefab_creator import create_bullet, create_input_player, create
 
 
 class PlayScene(Scene):
-    def __init__(self, engine, config_interface, config_starfield, config_window, config_level, config_player, config_bullet, config_enemy_explosion, config_player_exlosion, config_texts, config_enemies_list, config_enemy, config_enemy_bullet) -> None:
-        super().__init__(engine)
+    def __init__(self, engine, ecs_world, config_interface, config_starfield, config_window, config_level, config_player, config_bullet, config_enemy_explosion, config_player_exlosion, config_texts, config_enemies_list, config_enemy, config_enemy_bullet) -> None:
+        super().__init__(engine, ecs_world)
 
         # Configuration variables
         self.config_texts = config_texts
@@ -68,38 +70,50 @@ class PlayScene(Scene):
         self.global_score = 0
         self.is_paused = False
         self.active_keys = set()
+        self._player_entity = None
         self._bullet_entity = None
         self.paused_text_entity = None
-        self.attack_cooldown = self.ecs_world.create_entity()
-        self.bullet_enemy_cooldown = self.ecs_world.create_entity()
+        self.level_text_entity = None
+        
 
     def do_create(self):
+        if self.level > 5:
+            self.config_texts["LEVEL"]["content"] = f"{self.level:02}"
+            self.level_text_entity = create_text(self.ecs_world, self.config_texts["LEVEL"], self.config_interface)
+        if self._player_entity not in self.ecs_world._entities:
+            create_stars(self.ecs_world, self.config_starfield, self.config_window)
+            self.ready_text_entity = create_text(self.ecs_world, self.config_texts["READY"], self.config_interface)
+            self.ecs_world.add_component(self.ready_text_entity, CTimer(pygame.time.get_ticks(), 1500))
+            self.spawner_entity = self.ecs_world.create_entity()
+            self.ecs_world.add_component(self.spawner_entity, CEnemySpawner(self.config_enemies_list['enemy_spawn_events']))
+            self.ecs_world.add_component(self.spawner_entity, CCooldown(0.5))
+            self._player_entity = create_player(self.ecs_world, pygame.Vector2(self.config_level['player_spawn']["position"]["x"], self.config_level['player_spawn']["position"]["y"]), self.config_player)
+            self._player_c_velocity = self.ecs_world.component_for_entity(self._player_entity, CVelocity)
+            self._player_c_transform = self.ecs_world.component_for_entity(self._player_entity, CTransform)
+            self._player_c_surface = self.ecs_world.component_for_entity(self._player_entity, CSurface)
+            self._player_c_cooldown = self.ecs_world.component_for_entity(self._player_entity, CCooldown)
+            create_input_player(self.ecs_world)
+            self._bullet_entity = create_bullet(self.ecs_world, pygame.Vector2(0, 0), self.config_bullet, 2.5)
+            create_text(self.ecs_world, self.config_texts["1UP"], self.config_interface)
+            self.score_entity = create_text(self.ecs_world, self.config_texts["SCORE_P1"], self.config_interface)
+            create_text(self.ecs_world, self.config_texts["HIGH_SCORE"], self.config_interface)
+            self.high_score_text_entity = create_text(self.ecs_world, self.config_texts["HIGH_SCORE_VALUE"], self.config_interface)
+        else:
+            self.spawner_entity = self.ecs_world.create_entity()
+            self.ecs_world.add_component(self.spawner_entity, CEnemySpawner(self.config_enemies_list['enemy_spawn_events']))
+            self.ecs_world.add_component(self.spawner_entity, CCooldown(2))
         ServiceLocator.sounds_service.play(self.config_texts["READY"]["sound"])
-        self.ready_text_entity = create_text(self.ecs_world, self.config_texts["READY"], self.config_interface)
-        self.ecs_world.add_component(self.ready_text_entity, CTimer(pygame.time.get_ticks(), 1500))
-        spawner_entity = self.ecs_world.create_entity()
-        self.ecs_world.add_component(spawner_entity, CEnemySpawner(self.config_enemies_list['enemy_spawn_events']))
-        self.ecs_world.add_component(spawner_entity, CCooldown(0.5))
+        self.attack_cooldown = self.ecs_world.create_entity()
+        self.bullet_enemy_cooldown = self.ecs_world.create_entity()
         self.ecs_world.add_component(self.attack_cooldown, CCooldown(10))
         self.ecs_world.add_component(self.bullet_enemy_cooldown, CCooldown(3))
-        create_stars(self.ecs_world, self.config_starfield, self.config_window)
-        self._player_entity = create_player(self.ecs_world, pygame.Vector2(self.config_level['player_spawn']["position"]["x"], self.config_level['player_spawn']["position"]["y"]), self.config_player)
-        self._player_c_velocity = self.ecs_world.component_for_entity(self._player_entity, CVelocity)
-        self._player_c_transform = self.ecs_world.component_for_entity(self._player_entity, CTransform)
-        self._player_c_surface = self.ecs_world.component_for_entity(self._player_entity, CSurface)
-        self._player_c_cooldown = self.ecs_world.component_for_entity(self._player_entity, CCooldown)
-        create_input_player(self.ecs_world)
-        self._bullet_entity = create_bullet(self.ecs_world, pygame.Vector2(0, 0), self.config_bullet, 2.5)
-        create_text(self.ecs_world, self.config_texts["1UP"], self.config_interface)
-        self.score_entity = create_text(self.ecs_world, self.config_texts["SCORE_P1"], self.config_interface)
-        create_text(self.ecs_world, self.config_texts["HIGH_SCORE"], self.config_interface)
-        self.high_score_text_entity = create_text(self.ecs_world, self.config_texts["HIGH_SCORE_VALUE"], self.config_interface)
         create_lives_display(self.ecs_world)
         create_level_flags(self.ecs_world)
-
+            
     def do_process_events(self, event:pygame.event):
         if event.type == pygame.QUIT:
             self.is_running = False
+        
         elif self._player_c_cooldown.current_time > 0.1:
             return
         system_input_player(self.ecs_world, event, self.do_action, self.is_paused)
@@ -154,6 +168,11 @@ class PlayScene(Scene):
 
     def do_clean(self):
         self.is_paused = False
+        all_entities = list(self.ecs_world._entities.keys())
+        entities_to_delete = [self.spawner_entity, self.ready_text_entity, self.level_text_entity]
+        for entity in all_entities:
+            if entity in entities_to_delete:
+                self.ecs_world.delete_entity(entity)
 
     def do_action(self, action: CInputCommand):
         if action.name == "PLAYER_LEFT_kl" or action.name == "PLAYER_LEFT_a" or action.name == "PLAYER_RIGHT_d" or action.name == "PLAYER_RIGHT_kr":

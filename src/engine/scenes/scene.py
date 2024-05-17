@@ -7,8 +7,8 @@ from src.ecs.systems.s_rendering import system_rendering
 import src.engine.game_engine
 
 class Scene:
-    def __init__(self, game_engine:'src.engine.game_engine.GameEngine') -> None:
-        self.ecs_world = esper.World()
+    def __init__(self, game_engine:'src.engine.game_engine.GameEngine', ecs_world:esper.World) -> None:
+        self.ecs_world = ecs_world
         self._game_engine:src.engine.game_engine.GameEngine = game_engine
         self.screen = self._game_engine.screen
 
@@ -21,8 +21,7 @@ class Scene:
 
     def clean(self):
         self.ecs_world.clear_database()
-        self.do_clean()
-    
+            
     def switch_scene(self, new_scene_name:str):
         self._game_engine.switch_scene(new_scene_name)
 
@@ -39,6 +38,7 @@ class Scene:
         pass
     
     def do_clean(self):
+        self.clean()
         pass
 
     
