@@ -6,7 +6,9 @@ from src.ecs.components.tags.c_tag_enemy import CTagEnemy
 import random
 import pygame
 
-def system_choose_enemy_attack(world:esper.World, entity):
+from src.engine.service_locator import ServiceLocator
+
+def system_choose_enemy_attack(world:esper.World, entity, enemy_config:dict):
     global_cooldown = world.component_for_entity(entity, CCooldown)
 
     if global_cooldown.current_time  > 0.1 :
@@ -32,6 +34,7 @@ def system_choose_enemy_attack(world:esper.World, entity):
             most_right.append((ent, grid_pos))
     random_attacker = random.choice(most_left + most_right)
     world.component_for_entity(random_attacker[0], CEnemyState).change_state(EnemyState.EMERGING)
+    ServiceLocator.sounds_service.play(enemy_config["Enemy1"]["sound_chase"])
     if random_attacker in most_left:
         world.component_for_entity(random_attacker[0], CEnemyState).emerge_direction = -1
     else:
