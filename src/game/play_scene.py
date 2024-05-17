@@ -1,5 +1,6 @@
 import pygame
 
+
 from src.ecs.components.c_timer import CTimer
 from src.engine.scenes.scene import Scene
 from src.ecs.components.c_surface import CSurface
@@ -35,6 +36,7 @@ from src.ecs.systems.s_collision_bullet_enemy import system_collision_bullet_ene
 from src.ecs.systems.s_collision_player_enemy import system_collision_player_enemy
 from src.ecs.systems.s_screen_delete_bullet import system_screen_delete_bullet
 from src.ecs.systems.s_collision_bullet_player import system_collision_bullet_player
+from src.ecs.systems.s_check_enemies import system_check_all_enemies_defeated
 
 from src.create.prefab_creator import create_bullet, create_input_player, create_level_flags, create_lives_display, create_player, create_stars, create_text
 
@@ -57,8 +59,9 @@ class PlayScene(Scene):
         self.config_player_explosion = config_player_exlosion
 
         # Game variables
+        self.enemies_initialized = False
         self.lives = 3
-        self.level = 3
+        self.level = 5
         self.max_bullets = 1
         self.global_score = 0
         self.is_paused = False
@@ -118,7 +121,7 @@ class PlayScene(Scene):
             system_limit_player(self.ecs_world, self.screen)
             system_enemy_movement(self.ecs_world, self.screen, delta_time)
             system_screen_delete_bullet(self.ecs_world, self.screen)
-            system_enemy_spawner(self.ecs_world, self.config_enemy, self.config_enemies_list)
+            system_enemy_spawner(self.ecs_world, self.config_enemy, self.config_enemies_list,self)
             system_collision_bullet_enemy(self.ecs_world, self._bullet_entity, self.config_enemy_explosion, self.update_global_score)
             system_collision_bullet_player(self.ecs_world, self._bullet_entity, self.config_player_explosion)
             system_collision_player_enemy(self.ecs_world, self._player_entity, self.config_level, self.config_player_explosion, self.update_global_score)
@@ -131,13 +134,17 @@ class PlayScene(Scene):
             system_update_score(self.ecs_world, self.global_score, self.score_entity, self.config_texts)
             system_update_high_score(self.ecs_world, self.global_score, self.config_texts, self.high_score_text_entity)
             self.ecs_world._clear_dead_entities()
+            if self.enemies_initialized and system_check_all_enemies_defeated(self.ecs_world):
+                self.enemies_initialized = False
+                self.switch_scene("PLAY_SCENE")
+                self.level += 1
 
     def do_draw(self, screen):
         screen.fill((self.config_window['bg_color']['r'], self.config_window['bg_color']['g'], self.config_window['bg_color']['b']))
         system_render_stars(self.ecs_world, screen)
         system_rendering(self.ecs_world, screen)
         system_render_lives(self.ecs_world, screen, self.lives)
-        system_render_flags(self.ecs_world, screen, self.level)    
+        system_render_flags(self.ecs_world, screen, self.level, self.config_interface)    
         system_render_text(self.ecs_world, screen)
         pygame.display.flip()
 
