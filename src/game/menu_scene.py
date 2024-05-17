@@ -16,12 +16,11 @@ from src.create.prefab_creator import create_stars, create_static_image, create_
 
 class MenuScene(Scene):
 
-    def __init__(self, game_engine, config_texts:dict, config_interface:dict) -> None:
-        super().__init__(game_engine)
+    def __init__(self, game_engine, ecs_world, config_texts:dict, config_interface:dict) -> None:
+        super().__init__(game_engine, ecs_world)
         self.config_texts = config_texts
         self.config_interface = config_interface
 
-    
     def do_create(self):
         create_stars(self.ecs_world, self._game_engine.config_starfield, self._game_engine.config_window)
         create_text(self.ecs_world, self.config_texts["HIGH_SCORE"], self.config_interface)
@@ -72,3 +71,6 @@ class MenuScene(Scene):
             elif action.name == "DOWN" and action.phase == CommandPhase.START:        
                 if abs(self.ecs_world.component_for_entity(self.selector_entity, CTransform).position.y - 123) < 2:
                     self.ecs_world.component_for_entity(self.selector_entity, CTransform).position = pygame.Vector2(80, 138)
+
+    def do_clean(self):
+        return super().do_clean()
