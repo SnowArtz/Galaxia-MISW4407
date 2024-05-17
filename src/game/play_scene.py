@@ -1,6 +1,7 @@
 import pygame
 
 from src.ecs.components.c_timer import CTimer
+from src.ecs.systems.s_enemy_bullet import system_enemy_bullet
 from src.engine.scenes.scene import Scene
 from src.ecs.components.c_surface import CSurface
 from src.ecs.components.c_velocity import CVelocity
@@ -40,7 +41,7 @@ from src.create.prefab_creator import create_bullet, create_input_player, create
 
 
 class PlayScene(Scene):
-    def __init__(self, engine, config_interface, config_starfield, config_window, config_level, config_player, config_bullet, config_enemy_explosion, config_player_exlosion, config_texts, config_enemies_list, config_enemy) -> None:
+    def __init__(self, engine, config_interface, config_starfield, config_window, config_level, config_player, config_bullet, config_enemy_explosion, config_player_exlosion, config_texts, config_enemies_list, config_enemy, config_enemy_bullet) -> None:
         super().__init__(engine)
 
         # Configuration variables
@@ -55,6 +56,7 @@ class PlayScene(Scene):
         self.config_enemies_list = config_enemies_list
         self.config_enemy_explosion = config_enemy_explosion
         self.config_player_explosion = config_player_exlosion
+        self.config_enemy_bullet = config_enemy_bullet
 
         # Game variables
         self.lives = 3
@@ -66,6 +68,7 @@ class PlayScene(Scene):
         self._bullet_entity = None
         self.paused_text_entity = None
         self.attack_cooldown = self.ecs_world.create_entity()
+        self.bullet_enemy_cooldown = self.ecs_world.create_entity()
 
     def do_create(self):
         ServiceLocator.sounds_service.play(self.config_texts["READY"]["sound"])
@@ -75,6 +78,7 @@ class PlayScene(Scene):
         self.ecs_world.add_component(spawner_entity, CEnemySpawner(self.config_enemies_list['enemy_spawn_events']))
         self.ecs_world.add_component(spawner_entity, CCooldown(0.5))
         self.ecs_world.add_component(self.attack_cooldown, CCooldown(10))
+        self.ecs_world.add_component(self.bullet_enemy_cooldown, CCooldown(3))
         create_stars(self.ecs_world, self.config_starfield, self.config_window)
         self._player_entity = create_player(self.ecs_world, pygame.Vector2(self.config_level['player_spawn']["position"]["x"], self.config_level['player_spawn']["position"]["y"]), self.config_player)
         self._player_c_velocity = self.ecs_world.component_for_entity(self._player_entity, CVelocity)
@@ -93,10 +97,9 @@ class PlayScene(Scene):
     def do_process_events(self, event:pygame.event):
         if event.type == pygame.QUIT:
             self.is_running = False
-        elif  self._player_c_cooldown.current_time > 0.1:
+        elif self._player_c_cooldown.current_time > 0.1:
             return
         system_input_player(self.ecs_world, event, self.do_action, self.is_paused)
-        
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_p:
                 if not self.is_paused:
@@ -120,12 +123,13 @@ class PlayScene(Scene):
             system_screen_delete_bullet(self.ecs_world, self.screen)
             system_enemy_spawner(self.ecs_world, self.config_enemy, self.config_enemies_list)
             system_collision_bullet_enemy(self.ecs_world, self._bullet_entity, self.config_enemy_explosion, self.update_global_score)
-            system_collision_bullet_player(self.ecs_world, self._bullet_entity, self.config_player_explosion)
+            system_collision_bullet_player(self.ecs_world, self.config_player_explosion, self.config_level)
             system_collision_player_enemy(self.ecs_world, self._player_entity, self.config_level, self.config_player_explosion, self.update_global_score)
             system_explosion(self.ecs_world)
             system_animation(self.ecs_world, delta_time)
-            system_choose_enemy_attack(self.ecs_world, self.attack_cooldown)
+            system_choose_enemy_attack(self.ecs_world, self.attack_cooldown, self.config_enemy)
             system_cooldown(world=self.ecs_world, delta_time=delta_time)
+            system_enemy_bullet(self.ecs_world, self.config_enemy_bullet, self.bullet_enemy_cooldown)
             system_enemy_state(world=self.ecs_world, delta_time=delta_time, screen_height=self.screen.get_rect().height, screen_width=self.screen.get_rect().width)
             self._bullet_entity = system_player_bullet(self.ecs_world, pygame.Vector2(self._player_c_transform.position.x + self._player_c_surface.area.width/2, self._player_c_transform.position.y), self.config_bullet)
             system_update_score(self.ecs_world, self.global_score, self.score_entity, self.config_texts)
