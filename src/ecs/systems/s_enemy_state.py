@@ -9,8 +9,13 @@ from src.ecs.components.tags.c_tag_player import CTagPlayer
 from src.ecs.components.c_enemy_state import CEnemyState, EnemyState
 
 def system_enemy_state(world: esper.World, delta_time: float, screen_height: int, screen_width: int) -> None:
-    player_entity = world.get_component(CTagPlayer)[0][0]
-    player_transform = world.component_for_entity(player_entity, CTransform)
+    player_entities = world.get_component(CTagPlayer)
+    if player_entities:
+        player_entity = player_entities[0][0]
+        player_transform = world.component_for_entity(player_entity, CTransform)
+    else:
+        player_entity = None
+        player_transform = None
 
     for ent, (enemy_animation, enemy_state, transform, grid_position) in world.get_components(CAnimation, CEnemyState, CTransform, CGridPosition):
         if enemy_state.state == EnemyState.IDLE:
@@ -27,7 +32,6 @@ def _do_idle_state(enemy_animation, enemy_state):
     _set_animation(enemy_animation, 0)
     enemy_state.emerge_angle = 0
     enemy_state.sprite_angle = 0
-    pass
 
 def _do_emerging_state(enemy_animation, transform, enemy_state, delta_time):
     _set_animation(enemy_animation, 0)
@@ -43,23 +47,28 @@ def _do_emerging_state(enemy_animation, transform, enemy_state, delta_time):
 
 def _do_attacking_state(enemy_animation, transform, enemy_state, grid_position, player_transform, delta_time, screen_height, screen_width):
     _set_animation(enemy_animation, 0)
-    target_pos = player_transform.position
+    y_threshold = 180
+    if player_transform:
+        target_pos = player_transform.position
+    else:
+        # Define una posición fija cuando el jugador no está presente
+        target_pos = pygame.math.Vector2(128, 224)
+
     direction = target_pos - transform.position
     distance = direction.length()
-    y_threshold = 180
+
     if transform.position.y > screen_height*1.2 or transform.position.x < 0 or transform.position.x > screen_width:
         transform.position.y = 0
         transform.position.x = grid_position.x
         enemy_state.sprite_angle = 180
         enemy_state.change_state(EnemyState.RETURNING)
-        return
     elif transform.position.y > y_threshold:
         if hasattr(enemy_state, 'last_curve_direction'):
             transform.position += enemy_state.last_curve_direction * delta_time
 
-        if player_transform.position.x > transform.position.x and enemy_state.emerge_direction == 1:
+        if player_transform and player_transform.position.x > transform.position.x and enemy_state.emerge_direction == 1:
             enemy_state.sprite_angle += 180 * delta_time
-        elif player_transform.position.x < transform.position.x and enemy_state.emerge_direction == -1:
+        elif player_transform and player_transform.position.x < transform.position.x and enemy_state.emerge_direction == -1:
             enemy_state.sprite_angle -= 180 * delta_time
         
     else:

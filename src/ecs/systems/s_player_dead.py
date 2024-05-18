@@ -8,8 +8,9 @@ from src.ecs.components.c_velocity import CVelocity
 from src.ecs.components.tags.c_tag_player import CTagPlayer
 from src.engine.service_locator import ServiceLocator
 
-def system_player_dead(world:esper.World, player_explosion_file: dict, config_level: dict, player_entity: int):
+def system_player_dead(world:esper.World, player_explosion_file: dict, config_level: dict, player_entity: int,self):
     create_player_explosion_sprite(world, player_entity, player_explosion_file)
+    self._game_engine.lives-=1
     cont = 0
     for i in range(1000):
         cont+=1
