@@ -159,7 +159,6 @@ class PlayScene(Scene):
                 self.time_init = pygame.time.get_ticks()
                 system_clear_player_and_bullets(self.ecs_world)
             
-            # Mientras el jugador no haya perdido tres veces, ejecuta la siguiente lógica
             if not self.switch_game_over and self.ecs_world.entity_exists(self._player_entity):
                
                 if not self.ecs_world.component_for_entity(self._player_entity, CCooldown).current_time > 0.1:
@@ -175,7 +174,6 @@ class PlayScene(Scene):
                     system_animation(self.ecs_world, delta_time)
 
             elif self.switch_game_over:
-                # Aquí manejas la transición a GAME OVER después de 3 segundos
                 current_time = pygame.time.get_ticks()
                 if (current_time - self.time_init) >= 2500:  
                     self.switch_game_over = False
