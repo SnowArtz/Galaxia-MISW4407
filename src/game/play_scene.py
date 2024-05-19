@@ -8,6 +8,7 @@ from src.ecs.components.tags.c_tag_flag import CTagFlag
 from src.ecs.components.tags.c_tag_life import CTagLife
 from src.ecs.systems.s_clear_bullet_player import system_clear_player_and_bullets
 from src.ecs.systems.s_enemy_bullet import system_enemy_bullet
+from src.ecs.systems.s_player_xd import system_player_xd
 from src.engine.scenes.scene import Scene
 from src.ecs.components.c_surface import CSurface
 from src.ecs.components.c_velocity import CVelocity
@@ -101,7 +102,6 @@ class PlayScene(Scene):
             self.score_entity = create_text(self.ecs_world, self.config_texts["SCORE_P1"], self.config_interface)
             create_text(self.ecs_world, self.config_texts["HIGH_SCORE"], self.config_interface)
             self.high_score_text_entity = create_text(self.ecs_world, self.config_texts["HIGH_SCORE_VALUE"], self.config_interface)
-
         else:
             self.spawner_entity = self.ecs_world.create_entity()
             self.ecs_world.add_component(self.spawner_entity, CEnemySpawner(self.config_enemies_list['enemy_spawn_events']))
@@ -159,20 +159,21 @@ class PlayScene(Scene):
                 self.time_init = pygame.time.get_ticks()
                 system_clear_player_and_bullets(self.ecs_world)
             
-            # Mientras el jugador no haya perdido tres veces, ejecuta la siguiente lógica
-            if not self.switch_game_over:
-                system_choose_enemy_attack(self.ecs_world, self.attack_cooldown, self.config_enemy)
-                system_enemy_bullet(self.ecs_world, self.config_enemy_bullet, self.bullet_enemy_cooldown)
-                system_limit_player(self.ecs_world, self.screen)
-                system_collision_bullet_enemy(self.ecs_world, self._bullet_entity, self.config_enemy_explosion, self.update_global_score)
-                system_collision_bullet_player(self.ecs_world, self.config_player_explosion, self.config_level,self)
-                system_collision_player_enemy(self.ecs_world, self._player_entity, self.config_level, self.config_player_explosion, self.update_global_score,self)
-                self._bullet_entity = system_player_bullet(self.ecs_world, pygame.Vector2(self._player_c_transform.position.x + self._player_c_surface.area.width/2, self._player_c_transform.position.y), self.config_bullet)
-                system_explosion(self.ecs_world)
-                system_animation(self.ecs_world, delta_time)
+            if not self.switch_game_over and self.ecs_world.entity_exists(self._player_entity):
+               
+                if not self.ecs_world.component_for_entity(self._player_entity, CCooldown).current_time > 0.1:
+                    
+                    system_enemy_bullet(self.ecs_world, self.config_enemy_bullet, self.bullet_enemy_cooldown)
+                    system_choose_enemy_attack(self.ecs_world, self.attack_cooldown, self.config_enemy)
+                    system_limit_player(self.ecs_world, self.screen)
+                    system_collision_bullet_enemy(self.ecs_world, self._bullet_entity, self.config_enemy_explosion, self.update_global_score)
+                    system_collision_bullet_player(self.ecs_world, self.config_player_explosion, self.config_level, self._bullet_entity, self)
+                    system_collision_player_enemy(self.ecs_world, self._player_entity, self.config_level, self.config_player_explosion, self.update_global_score,self._bullet_entity, self)
+                    self._bullet_entity = system_player_bullet(self.ecs_world, pygame.Vector2(self._player_c_transform.position.x + self._player_c_surface.area.width/2, self._player_c_transform.position.y), self.config_bullet, self._player_entity)
+                    system_explosion(self.ecs_world)
+                    system_animation(self.ecs_world, delta_time)
 
-            else:
-                # Aquí manejas la transición a GAME OVER después de 3 segundos
+            elif self.switch_game_over:
                 current_time = pygame.time.get_ticks()
                 if (current_time - self.time_init) >= 2500:  
                     self.switch_game_over = False
@@ -180,7 +181,8 @@ class PlayScene(Scene):
                     self.global_score=0
                     self.level = 1
                     self.switch_scene("GAME_OVER_SCENE") 
-                    
+            else:
+                system_player_xd(self.ecs_world, self, self.config_level, self.config_player, self.config_texts, self.config_interface)            
                     
 
     def do_draw(self, screen):

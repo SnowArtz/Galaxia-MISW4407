@@ -57,13 +57,13 @@ def create_sprite(world: esper.World, position: pygame.Vector2, velocity: pygame
     world.add_component(sprite_entity, CVelocity(velocity=velocity))
     return sprite_entity
 
-def create_player(world: esper.World, position: pygame.Vector2, player_information:dict) -> int:
+def create_player(world: esper.World, position: pygame.Vector2, player_information:dict, cooldown:float=2.5) -> int:
     player_surface = ServiceLocator.images_service.get(player_information["image"])
     velocity = pygame.Vector2(0, 0)
     position = pygame.Vector2(position.x-player_surface.get_width()/2, position.y-player_surface.get_height()/2)    
     player_entity = create_sprite(world, position, velocity, player_surface)
     world.add_component(player_entity, CTagPlayer())
-    world.add_component(player_entity, CCooldown(2.5))
+    world.add_component(player_entity, CCooldown(cooldown))
     return player_entity
 
 def create_bullet(world:esper.World, position: pygame.Vector2, bullet_information:dict, cooldown:int = 0) -> int:
