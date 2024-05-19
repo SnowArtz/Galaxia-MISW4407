@@ -8,7 +8,7 @@ from src.ecs.components.tags.c_tag_player import CTagPlayer
 from src.ecs.systems.s_player_dead import system_player_dead
 
 
-def system_collision_bullet_player(world:esper.World, player_explosion_file: dict, config_level:dict):
+def system_collision_bullet_player(world:esper.World, player_explosion_file: dict, config_level:dict,self):
     componentsP = world.get_components(CSurface, CTransform, CTagPlayer)
     componentsB = world.get_components(CSurface, CTransform, CTagEnemyBullet)
     for enemy_bullet_entity, (enemy_bullet_s, enemy_bullet_t, _) in componentsB:
@@ -19,4 +19,4 @@ def system_collision_bullet_player(world:esper.World, player_explosion_file: dic
             player_rect.topleft = player_t.position
             if player_rect.colliderect(bullet_rect):
                 world.delete_entity(enemy_bullet_entity)
-                system_player_dead(world, player_explosion_file, config_level, player_entity)
+                system_player_dead(world, player_explosion_file, config_level, player_entity,self)

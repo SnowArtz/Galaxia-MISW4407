@@ -4,6 +4,7 @@ import esper
 import pygame
 
 from pathlib import Path
+from src.game.game_over_scene import GameOverScene
 from src.game.menu_scene import MenuScene
 from src.game.play_scene import PlayScene
 from src.ecs.components.c_input_command import CInputCommand
@@ -25,6 +26,10 @@ class GameEngine:
         self.config_enemies_list = None
         self.config_enemy = None
         self.config_enemy_bullet = None
+        self.current_level = 1
+        self.global_score = 0
+        self.lives = 3
+    
 
         self._load_configurations()
 
@@ -42,6 +47,7 @@ class GameEngine:
         self._scenes = dict()
         self._scenes["MENU_SCENE"] = MenuScene(self, self.ecs_world, self.config_texts, self.config_interface)
         self._scenes["PLAY_SCENE"] = PlayScene(self, self.ecs_world, self.config_interface, self.config_starfield, self.config_window, self.config_level, self.config_player, self.config_bullet, self.config_enemy_explosion, self.config_player_explosion, self.config_texts, self.config_enemies_list, self.config_enemy, self.config_enemy_bullet)
+        self._scenes["GAME_OVER_SCENE"] = GameOverScene(self, self.ecs_world, self.config_texts, self.config_interface)
         self._current_scene = None
         self._scene_name_to_switch = None
         

@@ -51,6 +51,9 @@ class MenuScene(Scene):
         system_menu_initial_position(self.ecs_world)
         
     def do_update(self, delta_time: float):
+        self._game_engine.global_score=0
+        self._game_engine.lives=3
+        self._game_engine.current_level=1
         system_update_stars(self.ecs_world, delta_time, self._game_engine.config_window["size"]["h"])
         
     def do_draw(self, screen):

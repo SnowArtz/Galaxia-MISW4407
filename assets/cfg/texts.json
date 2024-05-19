@@ -130,7 +130,7 @@
             "y": 210
         }
     },
-    "LEVEL":{
+    "LEVEL": {
         "content": "1",
         "font": "assets/fnt/PressStart2P.ttf",
         "size": 8,
@@ -139,5 +139,16 @@
             "x": 211,
             "y": 28
         }
+    },
+    "GAME_OVER": {
+        "content": "GAME OVER",
+        "font": "assets/fnt/PressStart2P.ttf",
+        "size": 8,
+        "color": "normal_text_color",
+        "position": {
+            "x": -200,
+            "y": 100
+        },
+        "sound": "assets/snd/game_over.ogg"
     }
 }
