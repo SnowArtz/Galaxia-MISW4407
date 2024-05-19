@@ -91,7 +91,6 @@ class PlayScene(Scene):
             self.ecs_world.add_component(self.spawner_entity, CEnemySpawner(self.config_enemies_list['enemy_spawn_events']))
             self.ecs_world.add_component(self.spawner_entity, CCooldown(0.5))
             self._player_entity = create_player(self.ecs_world, pygame.Vector2(self.config_level['player_spawn']["position"]["x"], self.config_level['player_spawn']["position"]["y"]), self.config_player)
-            self._game_engine.lives -= 1
             self._player_c_velocity = self.ecs_world.component_for_entity(self._player_entity, CVelocity)
             self._player_c_transform = self.ecs_world.component_for_entity(self._player_entity, CTransform)
             self._player_c_surface = self.ecs_world.component_for_entity(self._player_entity, CSurface)
@@ -138,7 +137,6 @@ class PlayScene(Scene):
         if self.is_paused:
             system_blinking_text(self.ecs_world, delta_time)
         else:
-            print(self._game_engine.lives)
             system_movement(self.ecs_world, delta_time)
             system_enemy_movement(self.ecs_world, self.screen, delta_time)
             system_screen_delete_bullet(self.ecs_world, self.screen)
@@ -155,7 +153,7 @@ class PlayScene(Scene):
                 self.enemies_initialized = False
                 self.switch_scene("PLAY_SCENE")
                 self.level += 1
-            if self._game_engine.lives < 0 and not self.switch_game_over:
+            if self._game_engine.lives == 0 and not self.switch_game_over:
                 self._game_engine.current_level = self.level
                 self.switch_game_over = True
                 self.time_init = pygame.time.get_ticks()
@@ -172,15 +170,16 @@ class PlayScene(Scene):
                 self._bullet_entity = system_player_bullet(self.ecs_world, pygame.Vector2(self._player_c_transform.position.x + self._player_c_surface.area.width/2, self._player_c_transform.position.y), self.config_bullet)
                 system_explosion(self.ecs_world)
                 system_animation(self.ecs_world, delta_time)
+
             else:
                 # Aquí manejas la transición a GAME OVER después de 3 segundos
                 current_time = pygame.time.get_ticks()
-                if (current_time - self.time_init) >= 6000:  
+                if (current_time - self.time_init) >= 2500:  
                     self.switch_game_over = False
                     self.enemies_initialized = False
                     self.global_score=0
                     self.level = 1
-                    self.switch_scene("GAME_OVER_SCENE")
+                    self.switch_scene("GAME_OVER_SCENE") 
                     
                     
 

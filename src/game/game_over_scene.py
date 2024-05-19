@@ -1,6 +1,7 @@
 import pygame
 from src.ecs.systems.s_animation import system_animation
 from src.ecs.systems.s_enemy_movement import system_enemy_movement
+from src.ecs.systems.s_enemy_state import system_enemy_state
 from src.ecs.systems.s_game_over_animation import system_game_over_animation
 from src.ecs.systems.s_render_flags import system_render_flags
 from src.ecs.systems.s_render_lives import system_render_lives
@@ -25,9 +26,9 @@ class GameOverScene(Scene):
         # Función para resetear el estado cuando se entra a la escena
         self.animation_started = False
         self.animation_completed = False
-        self.initial_wait_time = 2.0
+        self.initial_wait_time = 0.0
         self.elapsed_time = 0
-        self.sound_delay_time = 1
+        self.sound_delay_time = 2.5
         self.sound_played = False
         self.scene_switch_timer_started = False
         self.scene_switch_delay = 5.0
@@ -37,12 +38,14 @@ class GameOverScene(Scene):
         # Asegúrate de reiniciar el estado cada vez que se crea la escena
         self.reset_state()
         # Crea "Game Over" utilizando la configuración nueva
-        self.game_over_text = create_text(self.ecs_world, self.config_texts["GAME_OVER"], self.config_interface)
+        self.game_over_text = create_text(self.ecs_world, self.config_texts["GAME_"], self.config_interface)
+        self.game_over_text = create_text(self.ecs_world, self.config_texts["_OVER"], self.config_interface)
 
     def do_update(self, delta_time: float):
         system_update_stars(self.ecs_world, delta_time, self._game_engine.config_window['size']['h'])
         system_animation(self.ecs_world, delta_time)
         system_enemy_movement(self.ecs_world, self.screen, delta_time)
+        system_enemy_state(world=self.ecs_world, delta_time=delta_time, screen_height=self.screen.get_rect().height, screen_width=self.screen.get_rect().width)
 
         self.elapsed_time += delta_time
 
@@ -58,7 +61,7 @@ class GameOverScene(Scene):
             )
 
             if not self.sound_played and (self.elapsed_time > self.initial_wait_time + self.sound_delay_time):
-                ServiceLocator.sounds_service.play(self.config_texts["GAME_OVER"]["sound"])
+                ServiceLocator.sounds_service.play(self.config_texts["GAME_"]["sound"])
                 self.sound_played = True
                 self.scene_switch_timer_started = True
 
