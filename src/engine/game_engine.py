@@ -28,7 +28,7 @@ class GameEngine:
         self.config_enemy_bullet = None
         self.current_level = 1
         self.global_score = 0
-        self.lives = 3
+        self.lives = 1
     
 
         self._load_configurations()
