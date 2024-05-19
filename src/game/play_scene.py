@@ -2,6 +2,7 @@ import pygame
 
 
 from src.ecs.components.c_timer import CTimer
+from src.ecs.components.tags.c_tag_player import CTagPlayer
 from src.ecs.systems.s_enemy_bullet import system_enemy_bullet
 from src.engine.scenes.scene import Scene
 from src.ecs.components.c_surface import CSurface
@@ -127,7 +128,7 @@ class PlayScene(Scene):
             system_enemy_spawner(self.ecs_world, self.config_enemy, self.config_enemies_list,self)
             system_collision_bullet_enemy(self.ecs_world, self._bullet_entity, self.config_enemy_explosion, self.update_global_score)
             system_collision_bullet_player(self.ecs_world, self.config_player_explosion, self.config_level)
-            system_collision_player_enemy(self.ecs_world, self._player_entity, self.config_level, self.config_player_explosion, self.update_global_score)
+            system_collision_player_enemy(self.ecs_world, self._player_entity, self.config_level, self.config_player_explosion, self.update_global_score, self._bullet_entity)
             system_explosion(self.ecs_world)
             system_animation(self.ecs_world, delta_time)
             system_choose_enemy_attack(self.ecs_world, self.attack_cooldown, self.config_enemy)

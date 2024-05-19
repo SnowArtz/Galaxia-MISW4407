@@ -1,3 +1,3 @@
 class CTagPlayer:
     def __init__(self):
-        pass
+        self.visible = True

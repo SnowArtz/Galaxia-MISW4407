@@ -8,6 +8,7 @@ from src.ecs.components.c_cooldown import CCooldown
 from src.ecs.components.c_enemy_state import CEnemyState
 from src.ecs.components.c_grid_position import CGridPosition
 from src.ecs.components.c_input_command import CInputCommand
+from src.ecs.components.c_player_state import CPlayerState
 from src.ecs.components.c_score import CScore
 from src.ecs.components.c_static_image import CStaticImage
 from src.ecs.components.c_star import CStar
@@ -46,10 +47,6 @@ def create_enemy(world: esper.World, position: pygame.Vector2, enemy_information
     
     return enemy_entity
 
-
-
-
-
 def create_sprite(world: esper.World, position: pygame.Vector2, velocity: pygame.Vector2, surface: pygame.Surface) -> int:
     sprite_entity = world.create_entity()
     world.add_component(sprite_entity, CSurface.from_surface(surface))
@@ -64,6 +61,7 @@ def create_player(world: esper.World, position: pygame.Vector2, player_informati
     player_entity = create_sprite(world, position, velocity, player_surface)
     world.add_component(player_entity, CTagPlayer())
     world.add_component(player_entity, CCooldown(2.5))
+    world.add_component(player_entity, CPlayerState())
     return player_entity
 
 def create_bullet(world:esper.World, position: pygame.Vector2, bullet_information:dict, cooldown:int = 0) -> int:
