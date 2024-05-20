@@ -153,7 +153,7 @@ class PlayScene(Scene):
                 self.enemies_initialized = False
                 self.switch_scene("PLAY_SCENE")
                 self.level += 1
-            if self._game_engine.lives == 0 and not self.switch_game_over:
+            if self._game_engine.lives == -1 and not self.switch_game_over:
                 self._game_engine.current_level = self.level
                 self.switch_game_over = True
                 self.time_init = pygame.time.get_ticks()
