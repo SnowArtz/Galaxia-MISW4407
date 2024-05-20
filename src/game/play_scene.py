@@ -108,9 +108,11 @@ class PlayScene(Scene):
             self.ecs_world.add_component(self.spawner_entity, CCooldown(2))
         ServiceLocator.sounds_service.play(self.config_texts["READY"]["sound"])
         self.attack_cooldown = self.ecs_world.create_entity()
+        self.life3_cooldown_entity = self.ecs_world.create_entity()
         self.bullet_enemy_cooldown = self.ecs_world.create_entity()
-        self.ecs_world.add_component(self.attack_cooldown, CCooldown(10))
         self.ecs_world.add_component(self.bullet_enemy_cooldown, CCooldown(3))
+        self.ecs_world.add_component(self.attack_cooldown, CCooldown(10))
+        self.ecs_world.add_component(self.life3_cooldown_entity, CCooldown(2.5))
         create_lives_display(self.ecs_world)
         create_level_flags(self.ecs_world)
             
@@ -152,13 +154,18 @@ class PlayScene(Scene):
             if self.enemies_initialized and system_check_all_enemies_defeated(self.ecs_world):
                 self.enemies_initialized = False
                 self.switch_scene("PLAY_SCENE")
-                self._game_engine.level += 1
-            if self._game_engine.lives == 0 and not self.switch_game_over:
-                self._game_engine.current_level = self._game_engine.level
+                self._game_engine.level += 1 
+            if self._game_engine.lives == -1 and not self.switch_game_over:
+                self._game_engine.current_level = self.level
                 self.switch_game_over = True
                 self.time_init = pygame.time.get_ticks()
                 system_clear_player_and_bullets(self.ecs_world)
-            
+            _life3_cooldown = self.ecs_world.component_for_entity(self.life3_cooldown_entity, CCooldown)
+            if _life3_cooldown.current_time > 0.1:
+                return
+            else:
+                if self._game_engine.lives == 3:
+                    self._game_engine.lives = 2
             if not self.switch_game_over and self.ecs_world.entity_exists(self._player_entity):
                
                 if not self.ecs_world.component_for_entity(self._player_entity, CCooldown).current_time > 0.1:
