@@ -29,6 +29,7 @@ class GameEngine:
         self.current_level = 1
         self.global_score = 0
         self.lives = 1
+        self.level = 1
     
 
         self._load_configurations()
