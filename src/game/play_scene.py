@@ -68,7 +68,7 @@ class PlayScene(Scene):
 
         # Game variables
         self.enemies_initialized = False
-        self.level = 1
+        self._game_engine.level = 1
         self.global_score=0
         self.max_bullets = 1
         self.is_paused = False
@@ -81,8 +81,8 @@ class PlayScene(Scene):
         
 
     def do_create(self):
-        if self.level > 5:
-            self.config_texts["LEVEL"]["content"] = f"{self.level:02}"
+        if self._game_engine.level > 5:
+            self.config_texts["LEVEL"]["content"] = f"{self._game_engine.level:02}"
             self.level_text_entity = create_text(self.ecs_world, self.config_texts["LEVEL"], self.config_interface)
         if self._player_entity not in self.ecs_world._entities:
             create_stars(self.ecs_world, self.config_starfield, self.config_window)
@@ -152,9 +152,9 @@ class PlayScene(Scene):
             if self.enemies_initialized and system_check_all_enemies_defeated(self.ecs_world):
                 self.enemies_initialized = False
                 self.switch_scene("PLAY_SCENE")
-                self.level += 1
+                self._game_engine.level += 1
             if self._game_engine.lives == 0 and not self.switch_game_over:
-                self._game_engine.current_level = self.level
+                self._game_engine.current_level = self._game_engine.level
                 self.switch_game_over = True
                 self.time_init = pygame.time.get_ticks()
                 system_clear_player_and_bullets(self.ecs_world)
@@ -179,7 +179,6 @@ class PlayScene(Scene):
                     self.switch_game_over = False
                     self.enemies_initialized = False
                     self.global_score=0
-                    self.level = 1
                     self.switch_scene("GAME_OVER_SCENE") 
             else:
                 system_player_xd(self.ecs_world, self, self.config_level, self.config_player, self.config_texts, self.config_interface)            
@@ -190,7 +189,7 @@ class PlayScene(Scene):
         system_render_stars(self.ecs_world, screen)
         system_rendering(self.ecs_world, screen)
         system_render_lives(self.ecs_world, screen, self._game_engine.lives)
-        system_render_flags(self.ecs_world, screen, self.level, self.config_interface)    
+        system_render_flags(self.ecs_world, screen, self._game_engine.level, self.config_interface)    
         system_render_text(self.ecs_world, screen)
         pygame.display.flip()
 

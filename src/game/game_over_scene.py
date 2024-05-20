@@ -40,6 +40,9 @@ class GameOverScene(Scene):
         # Crea "Game Over" utilizando la configuración nueva
         self.game_over_text = create_text(self.ecs_world, self.config_texts["GAME_"], self.config_interface)
         self.game_over_text = create_text(self.ecs_world, self.config_texts["_OVER"], self.config_interface)
+        if self._game_engine.level > 5:
+            self.config_texts["LEVEL"]["content"] = f"{self._game_engine.level:02}"
+            self.level_text_entity = create_text(self.ecs_world, self.config_texts["LEVEL"], self.config_interface)
 
     def do_update(self, delta_time: float):
         system_update_stars(self.ecs_world, delta_time, self._game_engine.config_window['size']['h'])
@@ -68,6 +71,7 @@ class GameOverScene(Scene):
         if self.scene_switch_timer_started:
             self.scene_switch_elapsed_time += delta_time
             if self.scene_switch_elapsed_time >= self.scene_switch_delay:
+                self._game_engine.level = 1
                 self._game_engine.switch_scene("MENU_SCENE")
 
     def do_draw(self, screen):
