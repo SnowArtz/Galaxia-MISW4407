@@ -156,7 +156,7 @@ class PlayScene(Scene):
                 self.switch_scene("PLAY_SCENE")
                 self._game_engine.level += 1 
             if self._game_engine.lives == -1 and not self.switch_game_over:
-                self._game_engine.current_level = self.level
+                self._game_engine.current_level = self._game_engine.level
                 self.switch_game_over = True
                 self.time_init = pygame.time.get_ticks()
                 system_clear_player_and_bullets(self.ecs_world)
