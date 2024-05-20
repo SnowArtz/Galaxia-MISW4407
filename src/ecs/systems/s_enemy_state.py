@@ -32,6 +32,8 @@ def _do_idle_state(enemy_animation, enemy_state):
     _set_animation(enemy_animation, 0)
     enemy_state.emerge_angle = 0
     enemy_state.sprite_angle = 0
+    enemy_state.shoots = 0
+
 
 def _do_emerging_state(enemy_animation, transform, enemy_state, delta_time):
     _set_animation(enemy_animation, 0)
