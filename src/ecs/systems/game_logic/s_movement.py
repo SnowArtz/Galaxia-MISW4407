@@ -10,5 +10,3 @@ def system_movement(world: esper.World, delta_time:float) -> None:
         if not world.has_component(ent, CTagEnemy):
             transform.position.x += velocity.velocity.x * delta_time
             transform.position.y += velocity.velocity.y * delta_time
-            pass
-    pass

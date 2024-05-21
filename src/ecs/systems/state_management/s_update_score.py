@@ -1,7 +1,6 @@
 from src.ecs.components.c_text import CText
 from src.ecs.components.c_transform import CTransform
 
-
 def system_update_score(world, global_score, score_text_entity, config_interface):
     if score_text_entity is not None:
         score_text_component = world.component_for_entity(score_text_entity, CText)

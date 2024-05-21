@@ -1,13 +1,7 @@
-import time
-import pygame
 import esper
-from src.create.prefab_creator import create_player_explosion_sprite
-from src.ecs.components.c_surface import CSurface
-from src.ecs.components.c_transform import CTransform
-from src.ecs.components.c_velocity import CVelocity
+
 from src.ecs.components.tags.c_tag_bullet import CTagBullet
-from src.ecs.components.tags.c_tag_player import CTagPlayer
-from src.engine.service_locator import ServiceLocator
+from src.create.prefab_creator import create_player_explosion_sprite
 
 def system_player_dead(world:esper.World, player_explosion_file: dict, config_level: dict, player_entity: int, bullet_entity: int, self):
     create_player_explosion_sprite(world, player_entity, player_explosion_file)

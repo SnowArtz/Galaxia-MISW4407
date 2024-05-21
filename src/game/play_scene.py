@@ -1,14 +1,9 @@
-import asyncio
-import time
 import pygame
 
-
 from src.ecs.components.c_timer import CTimer
-from src.ecs.components.tags.c_tag_flag import CTagFlag
-from src.ecs.components.tags.c_tag_life import CTagLife
-from src.ecs.systems.s_clear_bullet_player import system_clear_player_and_bullets
-from src.ecs.systems.s_enemy_bullet import system_enemy_bullet
-from src.ecs.systems.s_player_xd import system_player_xd
+from src.ecs.systems.utility.s_clear_bullet_player import system_clear_player_and_bullets
+from src.ecs.systems.enemy.s_enemy_bullet import system_enemy_bullet
+from src.ecs.systems.player.s_player_reappearance import system_player_reappearance
 from src.engine.scenes.scene import Scene
 from src.ecs.components.c_surface import CSurface
 from src.ecs.components.c_velocity import CVelocity
@@ -19,31 +14,31 @@ from src.ecs.components.tags.c_tag_bullet import CTagBullet
 from src.ecs.components.c_enemy_spawner import CEnemySpawner
 from src.ecs.components.c_input_command import CInputCommand, CommandPhase
 
-from src.ecs.systems.s_cooldown import system_cooldown
-from src.ecs.systems.s_movement import system_movement
-from src.ecs.systems.s_explosion import system_explosion
-from src.ecs.systems.s_rendering import system_rendering
-from src.ecs.systems.s_animation import system_animation
-from src.ecs.systems.s_render_text import system_render_text
-from src.ecs.systems.s_enemy_state import system_enemy_state
-from src.ecs.systems.s_blink_text import system_blinking_text
-from src.ecs.systems.s_input_player import system_input_player
-from src.ecs.systems.s_limit_player import system_limit_player
-from src.ecs.systems.s_render_flags import system_render_flags
-from src.ecs.systems.s_render_lives import system_render_lives
-from src.ecs.systems.s_render_stars import system_render_stars
-from src.ecs.systems.s_update_score import system_update_score
-from src.ecs.systems.s_update_stars import system_update_stars
-from src.ecs.systems.s_player_bullet import system_player_bullet
-from src.ecs.systems.s_enemy_spawner import system_enemy_spawner
-from src.ecs.systems.s_enemy_movement import system_enemy_movement
-from src.ecs.systems.s_update_high_score import system_update_high_score
-from src.ecs.systems.s_choose_enemy_attack import system_choose_enemy_attack
-from src.ecs.systems.s_collision_bullet_enemy import system_collision_bullet_enemy
-from src.ecs.systems.s_collision_player_enemy import system_collision_player_enemy
-from src.ecs.systems.s_screen_delete_bullet import system_screen_delete_bullet
-from src.ecs.systems.s_collision_bullet_player import system_collision_bullet_player
-from src.ecs.systems.s_check_enemies import system_check_all_enemies_defeated
+from src.ecs.systems.game_logic.s_cooldown import system_cooldown
+from src.ecs.systems.game_logic.s_movement import system_movement
+from src.ecs.systems.utility.s_explosion import system_explosion
+from src.ecs.systems.rendering.s_rendering import system_rendering
+from src.ecs.systems.utility.s_animation import system_animation
+from src.ecs.systems.rendering.s_render_text import system_render_text
+from src.ecs.systems.enemy.s_enemy_state import system_enemy_state
+from src.ecs.systems.rendering.s_blink_text import system_blinking_text
+from src.ecs.systems.input.s_input_player import system_input_player
+from src.ecs.systems.game_logic.s_limit_player import system_limit_player
+from src.ecs.systems.rendering.s_render_flags import system_render_flags
+from src.ecs.systems.rendering.s_render_lives import system_render_lives
+from src.ecs.systems.rendering.s_render_stars import system_render_stars
+from src.ecs.systems.state_management.s_update_score import system_update_score
+from src.ecs.systems.state_management.s_update_stars import system_update_stars
+from src.ecs.systems.player.s_player_bullet import system_player_bullet
+from src.ecs.systems.enemy.s_enemy_spawner import system_enemy_spawner
+from src.ecs.systems.enemy.s_enemy_movement import system_enemy_movement
+from src.ecs.systems.state_management.s_update_high_score import system_update_high_score
+from src.ecs.systems.game_logic.s_choose_enemy_attack import system_choose_enemy_attack
+from src.ecs.systems.collision.s_collision_bullet_enemy import system_collision_bullet_enemy
+from src.ecs.systems.collision.s_collision_player_enemy import system_collision_player_enemy
+from src.ecs.systems.collision.s_screen_delete_bullet import system_screen_delete_bullet
+from src.ecs.systems.collision.s_collision_bullet_player import system_collision_bullet_player
+from src.ecs.systems.game_logic.s_check_enemies import system_check_all_enemies_defeated
 
 from src.create.prefab_creator import create_bullet, create_input_player, create_level_flags, create_lives_display, create_player, create_stars, create_text
 
@@ -116,10 +111,7 @@ class PlayScene(Scene):
         create_level_flags(self.ecs_world)
             
     def do_process_events(self, event:pygame.event):
-        if event.type == pygame.QUIT:
-            self.is_running = False
-        
-        elif self._player_c_cooldown.current_time > 0.1:
+        if self._player_c_cooldown.current_time > 0.1:
             return
         system_input_player(self.ecs_world, event, self.do_action, self.is_paused)
         if event.type == pygame.KEYDOWN:
@@ -133,6 +125,7 @@ class PlayScene(Scene):
                     if self.paused_text_entity:
                         self.ecs_world.delete_entity(self.paused_text_entity)
                         self.paused_text_entity = None
+
     def do_update(self, delta_time: float):
         system_update_stars(self.ecs_world, delta_time, self.config_window["size"]["h"])
         if self.is_paused:
@@ -182,15 +175,14 @@ class PlayScene(Scene):
                     self.global_score = 0
                     self.switch_scene("GAME_OVER_SCENE") 
             else:
-                system_player_xd(self.ecs_world, self, self.config_level, self.config_player, self.config_texts, self.config_interface)            
+                system_player_reappearance(self.ecs_world, self, self.config_level, self.config_player, self.config_texts, self.config_interface)            
                     
-
     def do_draw(self, screen):
         screen.fill((self.config_window['bg_color']['r'], self.config_window['bg_color']['g'], self.config_window['bg_color']['b']))
         system_render_stars(self.ecs_world, screen)
         system_rendering(self.ecs_world, screen)
         system_render_lives(self.ecs_world, screen, self._game_engine.lives)
-        system_render_flags(self.ecs_world, screen, self._game_engine.level, self.config_interface)    
+        system_render_flags(self.ecs_world, screen, self._game_engine.level)    
         system_render_text(self.ecs_world, screen)
         pygame.display.flip()
 

@@ -1,5 +1,4 @@
 
-import math
 import esper
 import pygame
 
@@ -7,7 +6,6 @@ from src.create.prefab_creator import create_bullet
 from src.ecs.components.c_cooldown import CCooldown
 from src.ecs.components.c_transform import CTransform
 from src.ecs.components.tags.c_tag_bullet import CTagBullet
-
 
 def system_player_bullet(world:esper.World, position: pygame.Vector2, bullet_information:dict, player_entity:int):
     components = world.get_components(CTransform, CTagBullet)

@@ -7,7 +7,7 @@ from src.ecs.components.c_timer import CTimer
 from src.ecs.components.c_transform import CTransform
 from src.ecs.components.c_velocity import CVelocity
 
-def system_player_xd(ecs_world:esper.World, game_engine, config_level, config_player, config_texts, config_interface):
+def system_player_reappearance(ecs_world:esper.World, game_engine, config_level, config_player, config_texts, config_interface):
     game_engine.active_keys.clear()
     game_engine.ready_text_entity = create_text(ecs_world, config_texts["READY"], config_interface)
     game_engine.ecs_world.add_component(game_engine.ready_text_entity, CTimer(pygame.time.get_ticks()+1000, 1500))

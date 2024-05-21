@@ -5,13 +5,13 @@ from src.ecs.components.c_transform import CTransform
 from src.ecs.components.c_static_image import CStaticImage
 from src.ecs.components.c_input_command import CInputCommand, CommandPhase
 
-from src.ecs.systems.s_render_text import system_render_text
-from src.ecs.systems.s_blink_text import system_blinking_text
-from src.ecs.systems.s_update_stars import system_update_stars
-from src.ecs.systems.s_render_stars import system_render_stars
-from src.ecs.systems.s_menu_movement import system_menu_movement
-from src.ecs.systems.s_render_static_images import system_render_static_images
-from src.ecs.systems.s_menu_initial_position import system_menu_initial_position
+from src.ecs.systems.rendering.s_render_text import system_render_text
+from src.ecs.systems.rendering.s_blink_text import system_blinking_text
+from src.ecs.systems.state_management.s_update_stars import system_update_stars
+from src.ecs.systems.rendering.s_render_stars import system_render_stars
+from src.ecs.systems.scenes.s_menu_movement import system_menu_movement
+from src.ecs.systems.rendering.s_render_static_images import system_render_static_images
+from src.ecs.systems.scenes.s_menu_initial_position import system_menu_initial_position
 from src.create.prefab_creator import create_stars, create_static_image, create_text
 
 class MenuScene(Scene):

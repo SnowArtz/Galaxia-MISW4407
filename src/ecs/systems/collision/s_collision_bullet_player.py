@@ -1,11 +1,10 @@
 import pygame
 import esper
-from src.create.prefab_creator import create_player, create_player_explosion_sprite
 from src.ecs.components.c_surface import CSurface
 from src.ecs.components.c_transform import CTransform
 from src.ecs.components.tags.c_tag_enemy_bullet import CTagEnemyBullet
 from src.ecs.components.tags.c_tag_player import CTagPlayer
-from src.ecs.systems.s_player_dead import system_player_dead
+from src.ecs.systems.player.s_player_dead import system_player_dead
 
 
 def system_collision_bullet_player(world:esper.World, player_explosion_file: dict, config_level:dict, bullet_entity, self):
