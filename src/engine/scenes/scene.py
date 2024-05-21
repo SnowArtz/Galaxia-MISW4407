@@ -2,8 +2,8 @@ import pygame
 import esper
 
 from src.ecs.components.c_input_command import CInputCommand
-from src.ecs.systems.s_input import system_input
-from src.ecs.systems.s_rendering import system_rendering
+from src.ecs.systems.input.s_input import system_input
+from src.ecs.systems.rendering.s_rendering import system_rendering
 import src.engine.game_engine
 
 class Scene:

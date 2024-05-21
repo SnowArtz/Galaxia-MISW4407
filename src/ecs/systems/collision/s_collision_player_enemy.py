@@ -3,7 +3,7 @@ from src.ecs.components.c_score import CScore
 from src.ecs.components.c_surface import CSurface
 from src.ecs.components.c_transform import CTransform
 from src.ecs.components.tags.c_tag_enemy import CTagEnemy
-from src.ecs.systems.s_player_dead import system_player_dead
+from src.ecs.systems.player.s_player_dead import system_player_dead
 
 def system_collision_player_enemy(world: esper.World, player_entity: int, config_level: dict, player_explosion_file: dict, update_global_score, bullet_entity, self):
     if world.entity_exists(player_entity) == False:

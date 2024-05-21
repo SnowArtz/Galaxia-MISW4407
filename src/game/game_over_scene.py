@@ -1,13 +1,13 @@
 import pygame
-from src.ecs.systems.s_animation import system_animation
-from src.ecs.systems.s_enemy_movement import system_enemy_movement
-from src.ecs.systems.s_enemy_state import system_enemy_state
-from src.ecs.systems.s_game_over_animation import system_game_over_animation
-from src.ecs.systems.s_render_flags import system_render_flags
-from src.ecs.systems.s_render_lives import system_render_lives
-from src.ecs.systems.s_render_stars import system_render_stars
-from src.ecs.systems.s_render_text import system_render_text
-from src.ecs.systems.s_update_stars import system_update_stars
+from src.ecs.systems.utility.s_animation import system_animation
+from src.ecs.systems.enemy.s_enemy_movement import system_enemy_movement
+from src.ecs.systems.enemy.s_enemy_state import system_enemy_state
+from src.ecs.systems.scenes.s_game_over_animation import system_game_over_animation
+from src.ecs.systems.rendering.s_render_flags import system_render_flags
+from src.ecs.systems.rendering.s_render_lives import system_render_lives
+from src.ecs.systems.rendering.s_render_stars import system_render_stars
+from src.ecs.systems.rendering.s_render_text import system_render_text
+from src.ecs.systems.state_management.s_update_stars import system_update_stars
 from src.engine.scenes.scene import Scene
 from src.ecs.components.c_transform import CTransform
 from src.create.prefab_creator import create_stars, create_text
