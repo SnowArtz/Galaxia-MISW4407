@@ -1,14 +1,9 @@
-import asyncio
-import time
 import pygame
 
-
 from src.ecs.components.c_timer import CTimer
-from src.ecs.components.tags.c_tag_flag import CTagFlag
-from src.ecs.components.tags.c_tag_life import CTagLife
 from src.ecs.systems.s_clear_bullet_player import system_clear_player_and_bullets
 from src.ecs.systems.s_enemy_bullet import system_enemy_bullet
-from src.ecs.systems.s_player_xd import system_player_xd
+from src.ecs.systems.s_player_reappearance import system_player_reappearance
 from src.engine.scenes.scene import Scene
 from src.ecs.components.c_surface import CSurface
 from src.ecs.components.c_velocity import CVelocity
@@ -116,10 +111,7 @@ class PlayScene(Scene):
         create_level_flags(self.ecs_world)
             
     def do_process_events(self, event:pygame.event):
-        if event.type == pygame.QUIT:
-            self.is_running = False
-        
-        elif self._player_c_cooldown.current_time > 0.1:
+        if self._player_c_cooldown.current_time > 0.1:
             return
         system_input_player(self.ecs_world, event, self.do_action, self.is_paused)
         if event.type == pygame.KEYDOWN:
@@ -133,6 +125,7 @@ class PlayScene(Scene):
                     if self.paused_text_entity:
                         self.ecs_world.delete_entity(self.paused_text_entity)
                         self.paused_text_entity = None
+
     def do_update(self, delta_time: float):
         system_update_stars(self.ecs_world, delta_time, self.config_window["size"]["h"])
         if self.is_paused:
@@ -182,9 +175,8 @@ class PlayScene(Scene):
                     self.global_score = 0
                     self.switch_scene("GAME_OVER_SCENE") 
             else:
-                system_player_xd(self.ecs_world, self, self.config_level, self.config_player, self.config_texts, self.config_interface)            
+                system_player_reappearance(self.ecs_world, self, self.config_level, self.config_player, self.config_texts, self.config_interface)            
                     
-
     def do_draw(self, screen):
         screen.fill((self.config_window['bg_color']['r'], self.config_window['bg_color']['g'], self.config_window['bg_color']['b']))
         system_render_stars(self.ecs_world, screen)

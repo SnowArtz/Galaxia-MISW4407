@@ -31,7 +31,6 @@ class GameEngine:
         self.lives = 1
         self.level = 1
     
-
         self._load_configurations()
 
         self.ecs_world = esper.World()
