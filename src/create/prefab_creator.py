@@ -41,7 +41,7 @@ def create_enemy(world: esper.World, position: pygame.Vector2, enemy_information
     if "animations" in enemy_information:
         world.add_component(enemy_entity, CAnimation(enemy_information["animations"], offset=column % 3))
     
-    world.add_component(enemy_entity, CEnemyState())  # No pasas el estado aquí
+    world.add_component(enemy_entity, CEnemyState())
     world.add_component(enemy_entity, CScore(base_score=enemy_information['score']['default'], state_scores=enemy_information['score']))
     
     return enemy_entity
