@@ -14,7 +14,7 @@ def system_update_high_score(world, global_score, config_texts, high_score_text_
 
 def _save_configurations(config_texts):
     current_file_path = Path(__file__)
-    base_path = current_file_path.parents[3]
+    base_path = current_file_path.parents[4]
     config_path = os.path.join(base_path, 'assets', 'cfg', 'texts.json')
     with open(config_path, 'w') as file:
         json.dump(config_texts, file, indent=4)
