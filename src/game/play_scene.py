@@ -79,7 +79,6 @@ class PlayScene(Scene):
         self.level_text_entity = None
         self.switch_game_over=False
         
-
     def do_create(self):
         if self._game_engine.level > 5:
             self.config_texts["LEVEL"]["content"] = f"{self._game_engine.level:02}"
@@ -161,15 +160,10 @@ class PlayScene(Scene):
                 self.time_init = pygame.time.get_ticks()
                 system_clear_player_and_bullets(self.ecs_world)
             _life3_cooldown = self.ecs_world.component_for_entity(self.life3_cooldown_entity, CCooldown)
-            if _life3_cooldown.current_time > 0.1:
-                return
-            else:
-                if self._game_engine.lives == 3:
+            if _life3_cooldown.current_time < 0.1 and self._game_engine.lives == 3:
                     self._game_engine.lives = 2
             if not self.switch_game_over and self.ecs_world.entity_exists(self._player_entity):
-               
                 if not self.ecs_world.component_for_entity(self._player_entity, CCooldown).current_time > 0.1:
-                    
                     system_enemy_bullet(self.ecs_world, self.config_enemy_bullet, self.bullet_enemy_cooldown)
                     system_choose_enemy_attack(self.ecs_world, self.attack_cooldown, self.config_enemy)
                     system_limit_player(self.ecs_world, self.screen)
@@ -185,7 +179,7 @@ class PlayScene(Scene):
                 if (current_time - self.time_init) >= 2500:  
                     self.switch_game_over = False
                     self.enemies_initialized = False
-                    self.global_score=0
+                    self.global_score = 0
                     self.switch_scene("GAME_OVER_SCENE") 
             else:
                 system_player_xd(self.ecs_world, self, self.config_level, self.config_player, self.config_texts, self.config_interface)            
