@@ -1,13 +1,11 @@
 import esper
 import pygame
 
-from src.create.prefab_creator import create_text
-from src.ecs.components.c_static_image import CStaticImage
-from src.ecs.components.c_text import CText
 from src.ecs.components.tags.c_tag_flag import CTagFlag
+from src.ecs.components.c_static_image import CStaticImage
 
 
-def system_render_flags(world: esper.World, screen: pygame.Surface, level_flags: int, config_interface: dict):
+def system_render_flags(world: esper.World, screen: pygame.Surface, level_flags: int):
     for ent, (image, flag) in world.get_components(CStaticImage, CTagFlag):
         if level_flags < 6:
             for i in range(level_flags):

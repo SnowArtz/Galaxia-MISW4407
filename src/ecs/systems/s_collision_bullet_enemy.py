@@ -1,4 +1,3 @@
-import pygame
 import esper
 from src.ecs.components.c_score import CScore
 from src.ecs.components.c_surface import CSurface

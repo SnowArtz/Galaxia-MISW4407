@@ -76,7 +76,7 @@ class GameOverScene(Scene):
 
     def do_draw(self, screen):
         system_render_lives(self.ecs_world, screen, 0)
-        system_render_flags(self.ecs_world, screen, self._game_engine.current_level, self.config_interface)
+        system_render_flags(self.ecs_world, screen, self._game_engine.current_level)
         system_render_stars(self.ecs_world, screen)
         system_render_text(self.ecs_world, screen)
         if self.animation_completed:
@@ -84,6 +84,5 @@ class GameOverScene(Scene):
         super().do_draw(screen)
 
     def do_clean(self):
-        # Aquí puedes limpiar cualquier estado necesario
         super().do_clean()
 

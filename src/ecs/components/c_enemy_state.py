@@ -16,6 +16,3 @@ class CEnemyState:
         self.angle = 0
         self.speed = 75
         self.shoots = 0
-
-    def change_state(self, new_state: EnemyState):
-        self.state = new_state

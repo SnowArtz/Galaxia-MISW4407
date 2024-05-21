@@ -45,7 +45,7 @@ def _do_emerging_state(enemy_animation, transform, enemy_state, delta_time):
 
     if enemy_state.emerge_angle >= 0.8 * 3/2 * math.pi:
         enemy_state.sprite_angle = enemy_state.emerge_direction*90
-        enemy_state.change_state(EnemyState.ATTACKING)
+        enemy_state.state = EnemyState.ATTACKING
 
 def _do_attacking_state(enemy_animation, transform, enemy_state, grid_position, player_transform, delta_time, screen_height, screen_width):
     _set_animation(enemy_animation, 0)
@@ -63,7 +63,7 @@ def _do_attacking_state(enemy_animation, transform, enemy_state, grid_position, 
         transform.position.y = 0
         transform.position.x = grid_position.x
         enemy_state.sprite_angle = 180
-        enemy_state.change_state(EnemyState.RETURNING)
+        enemy_state.state = EnemyState.RETURNING
     elif transform.position.y > y_threshold:
         if hasattr(enemy_state, 'last_curve_direction'):
             transform.position += enemy_state.last_curve_direction * delta_time
@@ -91,7 +91,7 @@ def _do_returning_state(enemy_animation, transform, enemy_state, grid_position, 
     if abs(transform.position.x - grid_position.x) < 3 and abs(transform.position.y - grid_position.y) < 3:
             transform.position.x = grid_position.x
             transform.position.y = grid_position.y
-            enemy_state.change_state(EnemyState.IDLE)
+            enemy_state.state = EnemyState.IDLE
     else:
         direction = (target_position - transform.position).normalize()
         transform.position.x =  grid_position.x * 0.5 + transform.position.x * 0.5

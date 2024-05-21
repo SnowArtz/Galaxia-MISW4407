@@ -28,27 +28,19 @@ from src.engine.service_locator import ServiceLocator
 def create_enemy(world: esper.World, position: pygame.Vector2, enemy_information: dict, row: int, column: int) -> int:
     enemy_surface = ServiceLocator.images_service.get(enemy_information["image"])
     velocity = pygame.Vector2(enemy_information['velocity_move'], 0)
-
     if "animations" in enemy_information:
         position = pygame.Vector2(position.x - (enemy_surface.get_width() / (enemy_information["animations"]["number_frames"] * 2)), position.y - enemy_surface.get_height() / 2)
         enemy_entity = create_sprite(world, position, velocity, enemy_surface)
     else:
         position = pygame.Vector2(position.x - enemy_surface.get_width() / 2, position.y - enemy_surface.get_height() / 2)
         enemy_entity = create_sprite(world, position, velocity, enemy_surface)
-    
     world.add_component(enemy_entity, CTagEnemy())
     world.add_component(enemy_entity, CGridPosition(row, column, position.x, position.y))
     if "animations" in enemy_information:
         world.add_component(enemy_entity, CAnimation(enemy_information["animations"], offset=column % 3))
-    
     world.add_component(enemy_entity, CEnemyState())
     world.add_component(enemy_entity, CScore(base_score=enemy_information['score']['default'], state_scores=enemy_information['score']))
-    
     return enemy_entity
-
-
-
-
 
 def create_sprite(world: esper.World, position: pygame.Vector2, velocity: pygame.Vector2, surface: pygame.Surface) -> int:
     sprite_entity = world.create_entity()

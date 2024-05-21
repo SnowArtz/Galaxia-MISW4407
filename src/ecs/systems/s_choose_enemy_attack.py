@@ -47,6 +47,6 @@ def system_choose_enemy_attack(world:esper.World, entity, enemy_config:dict):
     if (most_left is None and most_right is None) or not world.entity_exists(random_attacker[0]):
         return
     world.component_for_entity(random_attacker[0], CEnemyState).emerge_direction = emerge_direction
-    world.component_for_entity(random_attacker[0], CEnemyState).change_state(EnemyState.EMERGING)
+    world.component_for_entity(random_attacker[0], CEnemyState).state = EnemyState.EMERGING
     ServiceLocator.sounds_service.play(enemy_config["Enemy1"]["sound_chase"])
     global_cooldown.current_time = global_cooldown.cooldown_time

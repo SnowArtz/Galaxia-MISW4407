@@ -8,9 +8,8 @@ def system_blinking_text(world: esper.World, delta_time: float) -> None:
         blink.next_blink_time -= delta_time
         if blink.next_blink_time <= 0:
             blink.visible = not blink.visible
-            blink.next_blink_time = blink.blink_rate  # Restablece el temporizador para el próximo parpadeo
-            
+            blink.next_blink_time = blink.blink_rate
             if blink.visible:
-                text.color.a = 255  # Hacer el texto visible
+                text.color.a = 255
             else:
-                text.color.a = 0  # Hacer el texto invisible
+                text.color.a = 0

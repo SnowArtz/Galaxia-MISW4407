@@ -190,7 +190,7 @@ class PlayScene(Scene):
         system_render_stars(self.ecs_world, screen)
         system_rendering(self.ecs_world, screen)
         system_render_lives(self.ecs_world, screen, self._game_engine.lives)
-        system_render_flags(self.ecs_world, screen, self._game_engine.level, self.config_interface)    
+        system_render_flags(self.ecs_world, screen, self._game_engine.level)    
         system_render_text(self.ecs_world, screen)
         pygame.display.flip()
 
