@@ -1,6 +1,7 @@
 import pygame
 
 from src.ecs.components.c_timer import CTimer
+from src.ecs.systems.utility.s_check_timers_and_play_sound import system_check_timers_and_play_sound
 from src.ecs.systems.utility.s_clear_bullet_player import system_clear_player_and_bullets
 from src.ecs.systems.enemy.s_enemy_bullet import system_enemy_bullet
 from src.ecs.systems.player.s_player_reappearance import system_player_reappearance
@@ -98,6 +99,8 @@ class PlayScene(Scene):
             self.high_score_text_entity = create_text(self.ecs_world, self.config_texts["HIGH_SCORE_VALUE"], self.config_interface)
         else:
             self.spawner_entity = self.ecs_world.create_entity()
+            self.ready_text_entity = create_text(self.ecs_world, self.config_texts["READY"], self.config_interface)
+            self.ecs_world.add_component(self.ready_text_entity, CTimer(pygame.time.get_ticks(), 1500))
             self.ecs_world.add_component(self.spawner_entity, CEnemySpawner(self.config_enemies_list['enemy_spawn_events']))
             self.ecs_world.add_component(self.spawner_entity, CCooldown(2))
         ServiceLocator.sounds_service.play(self.config_texts["READY"]["sound"])
@@ -119,12 +122,14 @@ class PlayScene(Scene):
                 if not self.is_paused:
                     self.is_paused = True
                     self.paused_text_entity = create_text(self.ecs_world, self.config_texts["PAUSED"], self.config_interface, blink=True, blink_rate=0.5)
+                    ServiceLocator.sounds_service.stop_all()
                     ServiceLocator.sounds_service.play(self.config_interface["sound"])
                 else:
                     self.is_paused = False
                     if self.paused_text_entity:
                         self.ecs_world.delete_entity(self.paused_text_entity)
                         self.paused_text_entity = None
+                        ServiceLocator.sounds_service.play("assets/snd/game_loop.ogg", loops=-1)
 
     def do_update(self, delta_time: float):
         system_update_stars(self.ecs_world, delta_time, self.config_window["size"]["h"])
@@ -141,7 +146,6 @@ class PlayScene(Scene):
             system_update_score(self.ecs_world, self.global_score, self.score_entity, self.config_texts)
             system_update_high_score(self.ecs_world, self.global_score, self.config_texts, self.high_score_text_entity)
             system_enemy_state(world=self.ecs_world, delta_time=delta_time, screen_height=self.screen.get_rect().height, screen_width=self.screen.get_rect().width)
-
             self.ecs_world._clear_dead_entities()
             if self.enemies_initialized and system_check_all_enemies_defeated(self.ecs_world):
                 self.enemies_initialized = False
@@ -176,7 +180,8 @@ class PlayScene(Scene):
                     self.switch_scene("GAME_OVER_SCENE") 
             else:
                 system_player_reappearance(self.ecs_world, self, self.config_level, self.config_player, self.config_texts, self.config_interface)            
-                    
+            system_check_timers_and_play_sound(self.ecs_world, delta_time, self.ready_text_entity)
+
     def do_draw(self, screen):
         screen.fill((self.config_window['bg_color']['r'], self.config_window['bg_color']['g'], self.config_window['bg_color']['b']))
         system_render_stars(self.ecs_world, screen)
@@ -193,6 +198,7 @@ class PlayScene(Scene):
         for entity in all_entities:
             if entity in entities_to_delete:
                 self.ecs_world.delete_entity(entity)
+        ServiceLocator.sounds_service.stop_all()
 
     def do_action(self, action: CInputCommand):
         if action.name == "PLAYER_LEFT_kl" or action.name == "PLAYER_LEFT_a" or action.name == "PLAYER_RIGHT_d" or action.name == "PLAYER_RIGHT_kr":
